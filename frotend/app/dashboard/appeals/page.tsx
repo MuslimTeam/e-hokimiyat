@@ -49,7 +49,8 @@ const mockAppeals = [
     category: "employment" as const,
     createdAt: "2024-01-15T10:30:00Z",
     response: null,
-    department: "Иш билан таъминлаш бўлими"
+    department: "Иш билан таъминлаш бўлими",
+    district: "center"
   },
   {
     id: "2", 
@@ -63,7 +64,8 @@ const mockAppeals = [
     category: "utilities" as const,
     createdAt: "2024-01-14T14:20:00Z",
     response: "Мурожаатингиз қабул қилинди. Мутахассислар томонидан ўрганиш бошланди.",
-    department: "Коммуналь хизматлар бўлими"
+    department: "Коммуналь хизматлар бўлими",
+    district: "north"
   },
   {
     id: "3",
@@ -77,7 +79,8 @@ const mockAppeals = [
     category: "education" as const,
     createdAt: "2024-01-13T09:15:00Z",
     response: "Таклифингиз ҳисобга олинди. Маълумотлар маърифат бўлимига юборилди.",
-    department: "Маърифат бўлими"
+    department: "Маърифат бўлими",
+    district: "south"
   },
   {
     id: "4",
@@ -91,7 +94,8 @@ const mockAppeals = [
     category: "infrastructure" as const,
     createdAt: "2024-01-12T16:45:00Z",
     response: null,
-    department: "Йўл қурилиши бўлими"
+    department: "Йўл қурилиши бўлими",
+    district: "east"
   },
   {
     id: "5",
@@ -105,7 +109,8 @@ const mockAppeals = [
     category: "health" as const,
     createdAt: "2024-01-11T11:30:00Z",
     response: "Мурожаатингиз тиббий бўлимга юборилди. Мутахассислар томонидан ўрганилмоқда.",
-    department: "Соғлиқни сақлаш бўлими"
+    department: "Соғлиқни сақлаш бўлими",
+    district: "west"
   }
 ]
 
@@ -150,10 +155,21 @@ export default function AppealsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
+  const [districtFilter, setDistrictFilter] = useState<string>("all")
   const [selectedAppeal, setSelectedAppeal] = useState<any>(null)
   const [isResponseDialogOpen, setIsResponseDialogOpen] = useState(false)
+  const [isConvertDialogOpen, setIsConvertDialogOpen] = useState(false)
   const [responseText, setResponseText] = useState("")
   const [appeals, setAppeals] = useState(mockAppeals)
+
+  const districts = [
+    { id: "all", name: "Барча туманлар" },
+    { id: "center", name: "Марказий туман" },
+    { id: "north", name: "Шимолий туман" },
+    { id: "south", name: "Жанубий туман" },
+    { id: "east", name: "Шарқий туман" },
+    { id: "west", name: "Ғарбий туман" },
+  ]
 
   const filteredAppeals = appeals.filter((appeal) => {
     const matchesSearch = 
@@ -164,8 +180,9 @@ export default function AppealsPage() {
     const matchesStatus = statusFilter === "all" || appeal.status === statusFilter
     const matchesCategory = categoryFilter === "all" || appeal.category === categoryFilter
     const matchesPriority = priorityFilter === "all" || appeal.priority === priorityFilter
+    const matchesDistrict = districtFilter === "all" || appeal.district === districtFilter
     
-    return matchesSearch && matchesStatus && matchesCategory && matchesPriority
+    return matchesSearch && matchesStatus && matchesCategory && matchesPriority && matchesDistrict
   })
 
   const handleSendResponse = () => {
@@ -177,6 +194,15 @@ export default function AppealsPage() {
       ))
       setResponseText("")
       setIsResponseDialogOpen(false)
+      setSelectedAppeal(null)
+    }
+  }
+
+  const handleConvertToTask = () => {
+    if (selectedAppeal) {
+      // Convert appeal to task logic here
+      console.log("Converting appeal to task:", selectedAppeal)
+      setIsConvertDialogOpen(false)
       setSelectedAppeal(null)
     }
   }
@@ -329,6 +355,19 @@ export default function AppealsPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    
+                    <Select value={districtFilter} onValueChange={setDistrictFilter}>
+                      <SelectTrigger className="w-full md:w-[140px] input-modern">
+                        <SelectValue placeholder="Туман" />
+                      </SelectTrigger>
+                      <SelectContent className="glass">
+                        {districts.map((district) => (
+                          <SelectItem key={district.id} value={district.id}>
+                            {district.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </CardContent>
@@ -404,6 +443,16 @@ export default function AppealsPage() {
                               Жавоб бериш
                             </DropdownMenuItem>
                           )}
+                          <DropdownMenuItem 
+                            className="hover:bg-white/10"
+                            onClick={() => {
+                              setSelectedAppeal(appeal)
+                              setIsConvertDialogOpen(true)
+                            }}
+                          >
+                            <Send className="mr-2 h-4 w-4" />
+                            Топшириққа айлантириш
+                          </DropdownMenuItem>
                           <DropdownMenuItem className="hover:bg-white/10">
                             <Archive className="mr-2 h-4 w-4" />
                             Архивлаш
@@ -440,6 +489,101 @@ export default function AppealsPage() {
           </section>
         </div>
       </div>
+
+      {/* Convert to Task Dialog */}
+      <Dialog open={isConvertDialogOpen} onOpenChange={setIsConvertDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] glass">
+          <DialogHeader>
+            <DialogTitle className="text-gradient-animated">Мурожаатни топшириққа айлантириш</DialogTitle>
+            <DialogDescription>
+              {selectedAppeal?.title} мурожаатини топшириқ сифатида яратиш
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedAppeal && (
+            <div className="space-y-4">
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="h-4 w-4" />
+                  <span className="font-medium">{selectedAppeal.applicant}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {selectedAppeal.email}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">{selectedAppeal.content}</p>
+                <div className="flex items-center gap-2 mt-2 text-sm">
+                  <Badge variant="outline" className="border-white/20">
+                    {categoryLabels[selectedAppeal.category]}
+                  </Badge>
+                  <Badge variant="outline" className="border-white/20">
+                    {districts.find(d => d.id === selectedAppeal.district)?.name}
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="taskTitle">Топшириқ сарлавҳаси</Label>
+                <Input
+                  id="taskTitle"
+                  defaultValue={selectedAppeal.title}
+                  className="input-modern"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="taskDescription">Топшириқ тавсифи</Label>
+                <Textarea
+                  id="taskDescription"
+                  defaultValue={selectedAppeal.content}
+                  className="input-modern min-h-[120px]"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="taskPriority">Устуворлик</Label>
+                  <Select defaultValue="MUHIM">
+                    <SelectTrigger className="input-modern">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glass">
+                      <SelectItem value="MUHIM_SHOSHILINCH">1. MUHIM VA SHOSHILINCH</SelectItem>
+                      <SelectItem value="MUHIM">2. MUHIM, LEKIN SHOSHILINCH EMAS</SelectItem>
+                      <SelectItem value="SHOSHILINCH_EMAS">3. SHOSHILINCH, LEKIN MUHIM EMAS</SelectItem>
+                      <SelectItem value="ODDIY">4. MUHIM EMAS VA SHOSHILINCH EMAS</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="taskSector">Сўҳа</Label>
+                  <Select defaultValue={selectedAppeal.category === "health" ? "SOGLIQNI_SAQLASH" : "KOMMUNAL_SOHA"}>
+                    <SelectTrigger className="input-modern">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glass">
+                      <SelectItem value="SOGLIQNI_SAQLASH">Соғлиқни сақлаш</SelectItem>
+                      <SelectItem value="KOMMUNAL_SOHA">Коммуналь хизматлар</SelectItem>
+                      <SelectItem value="TALIM">Таълим</SelectItem>
+                      <SelectItem value="IJTIMOIY_HIMOYA">Ижтимоий ҳимоя</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConvertDialogOpen(false)}>
+              Бекор қилиш
+            </Button>
+            <Button onClick={handleConvertToTask} className="btn-modern">
+              <Send className="mr-2 h-4 w-4" />
+              Топшириқ яратиш
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Response Dialog */}
       <Dialog open={isResponseDialogOpen} onOpenChange={setIsResponseDialogOpen}>
