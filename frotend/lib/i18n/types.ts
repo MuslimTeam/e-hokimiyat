@@ -1,4 +1,4 @@
-export type Language = 'uz' | 'ru' | 'en'
+export type Language = 'uz' | 'uz-cyrl' | 'ru' | 'en'
 
 export interface Translations {
   common: {

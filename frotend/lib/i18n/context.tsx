@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import type { Language, Translations } from './types'
 export type { Language, Translations } from './types'
 import { uzTranslations } from './uz'
+import { uzCyrlTranslations } from './uz-cyrl'
 import { ruTranslations } from './ru'
 import { enTranslations } from './en'
 
@@ -18,6 +19,7 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined)
 
 const translations = {
   uz: uzTranslations,
+  'uz-cyrl': uzCyrlTranslations,
   ru: ruTranslations,
   en: enTranslations,
 }
@@ -34,7 +36,7 @@ export function I18nProvider({ children, defaultLanguage = 'uz' }: I18nProviderP
   // Load language from localStorage on mount
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') as Language
-    if (savedLanguage && ['uz', 'ru', 'en'].includes(savedLanguage)) {
+    if (savedLanguage && ['uz', 'uz-cyrl', 'ru', 'en'].includes(savedLanguage)) {
       setLanguageState(savedLanguage)
     }
     setIsLoading(false)
