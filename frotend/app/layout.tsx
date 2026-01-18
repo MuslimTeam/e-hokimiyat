@@ -1,13 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
 import { I18nProvider } from "@/lib/i18n/context"
-
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Топшириқлар Бошқарув Тизими",
@@ -38,13 +33,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="uz" suppressHydrationWarning>
-      <body className={`font-sans antialiased`}>
+    <html lang="uz" className="light" suppressHydrationWarning>
+      <body className={`font-sans antialiased bg-background text-foreground`}>
         <I18nProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-            {children}
-            <Analytics />
-          </ThemeProvider>
+          {children}
+          <Analytics />
         </I18nProvider>
       </body>
     </html>

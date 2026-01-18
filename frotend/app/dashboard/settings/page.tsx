@@ -16,7 +16,6 @@ import {
   User,
   Bell,
   Shield,
-  Palette,
   Globe,
   Smartphone,
   Mail,
@@ -31,7 +30,6 @@ import {
   EyeOff,
 } from "lucide-react"
 import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
 import { useTranslation } from "@/lib/i18n/context"
 import { getSettings, getUsers, postSettings } from "@/lib/api"
 
@@ -42,7 +40,6 @@ export default function SettingsPage() {
   const [pushNotifications, setPushNotifications] = useState(false)
   const [taskDeadlineReminder, setTaskDeadlineReminder] = useState(true)
   const [newTaskNotification, setNewTaskNotification] = useState(true)
-  const [darkMode, setDarkMode] = useState(true)
   const [language, setLanguage] = useState("uz")
 
   const [botToken, setBotToken] = useState("")
@@ -56,8 +53,6 @@ export default function SettingsPage() {
   useEffect(() => {
     let mounted = true
     try {
-      const lsDark = localStorage.getItem("darkMode")
-      if (lsDark !== null) setDarkMode(lsDark === "1")
       const lsLang = localStorage.getItem("language")
       if (lsLang) setLanguage(lsLang)
     } catch (e) {}
@@ -69,7 +64,6 @@ export default function SettingsPage() {
         setSmtpHost(s.emailSmtpHost || "")
         setSmtpPort(String(s.emailSmtpPort || ""))
         setSenderEmail(s.emailSenderAddress || "")
-        setDarkMode(typeof s.darkMode !== "undefined" ? Boolean(s.darkMode) : darkMode)
         setLanguage(s.language || language)
       })
       .catch(() => {})
@@ -86,15 +80,6 @@ export default function SettingsPage() {
       mounted = false
     }
   }, [])
-
-  const { setTheme } = useTheme()
-
-  useEffect(() => {
-    try {
-      setTheme(darkMode ? "dark" : "light")
-      localStorage.setItem("darkMode", darkMode ? "1" : "0")
-    } catch (e) {}
-  }, [darkMode, setTheme])
 
   useEffect(() => {
     try {
@@ -117,7 +102,6 @@ export default function SettingsPage() {
 
   const saveSettings = async () => {
     const body: any = {
-      darkMode,
       language,
       emailNotifications,
       telegramNotifications,
@@ -142,90 +126,146 @@ export default function SettingsPage() {
   return (
     <>
       <Header title={t.settings.title} description={t.settings.description} />
-      <div className="p-6">
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList
-            className={`grid w-full ${isAdmin ? "grid-cols-5" : "grid-cols-4"} lg:w-[${isAdmin ? "600" : "500"}px]`}
-          >
-            <TabsTrigger value="profile" className="gap-2">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">{t.settings.profile}</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">{t.settings.notifications}</span>
-            </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">{t.settings.security}</span>
-            </TabsTrigger>
-            <TabsTrigger value="appearance" className="gap-2">
-              <Palette className="h-4 w-4" />
-              <span className="hidden sm:inline">{t.settings.appearance}</span>
-            </TabsTrigger>
-            {isAdmin && (
-              <TabsTrigger value="admin" className="gap-2">
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.settings.admin}</span>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-6">
+        {/* Animated background elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full animate-float" />
+          <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/10 rounded-full animate-float" style={{ animationDelay: "1s" }} />
+          <div className="absolute bottom-32 left-40 w-20 h-20 bg-pink-500/10 rounded-full animate-float" style={{ animationDelay: "2s" }} />
+          <div className="absolute bottom-20 right-20 w-28 h-28 bg-green-500/10 rounded-full animate-float" style={{ animationDelay: "3s" }} />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <Tabs defaultValue="profile" className="space-y-8">
+            <TabsList className="relative w-full grid grid-cols-5 lg:w-[600px] mx-auto bg-background/80 backdrop-blur-xl border border-border/50 rounded-2xl p-1 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 rounded-2xl opacity-50" />
+              
+              <TabsTrigger 
+                value="profile" 
+                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">{t.settings.profile}</span>
               </TabsTrigger>
-            )}
-          </TabsList>
+              
+              <TabsTrigger 
+                value="notifications" 
+                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="hidden sm:inline">{t.settings.notifications}</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="security" 
+                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">{t.settings.security}</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="appearance" 
+                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <Globe className="h-4 w-4" />
+                <span className="hidden sm:inline">{t.settings.appearance}</span>
+              </TabsTrigger>
+              
+              {isAdmin && (
+                <TabsTrigger 
+                  value="admin" 
+                  className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">{t.settings.admin}</span>
+                </TabsTrigger>
+              )}
+            </TabsList>
 
           {/* Profile Settings */}
-          <TabsContent value="profile">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle>{t.settings.profileInfo}</CardTitle>
-                <CardDescription>{t.settings.profileDescription}</CardDescription>
+          <TabsContent value="profile" className="animate-fade-in">
+            <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl hover:shadow-3xl transition-all duration-500">
+              <CardHeader className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10" />
+                <CardTitle className="relative flex items-center gap-3 text-2xl">
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                  {t.settings.profileInfo}
+                </CardTitle>
+                <CardDescription className="relative">{t.settings.profileDescription}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center gap-6">
-                  <Avatar className="h-20 w-20">
-                    <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-                      {currentUser.firstName[0]}
-                      {currentUser.lastName[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="text-lg font-semibold">
+              <CardContent className="space-y-8 p-8">
+                <div className="flex items-center gap-8 p-6 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl border border-primary/20">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24 ring-4 ring-primary/30 ring-offset-4 ring-offset-transparent">
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-3xl font-bold animate-pulse-modern">
+                        {currentUser.firstName[0]}
+                        {currentUser.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white animate-bounce-subtle" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                       {currentUser.firstName} {currentUser.lastName}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{currentUser.role}</p>
-                    <Badge variant="outline" className="mt-2 bg-accent/10 text-accent border-accent/30">
-                      <UserCheck className="mr-1 h-3 w-3" />
+                    <p className="text-lg text-muted-foreground">{currentUser.role}</p>
+                    <Badge variant="outline" className="mt-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-primary border-primary/30 px-4 py-2">
+                      <UserCheck className="mr-2 h-4 w-4" />
                       {t.settings.oneIDConnected}
                     </Badge>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="my-8" />
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>{t.settings.firstName}</Label>
-                    <Input defaultValue={currentUser.firstName} />
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-3 group">
+                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.firstName}</Label>
+                    <Input 
+                      defaultValue={currentUser.firstName} 
+                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label>{t.settings.lastName}</Label>
-                    <Input defaultValue={currentUser.lastName} />
+                  <div className="space-y-3 group">
+                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.lastName}</Label>
+                    <Input 
+                      defaultValue={currentUser.lastName} 
+                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label>{t.settings.middleName}</Label>
-                    <Input defaultValue={currentUser.middleName} />
+                  <div className="space-y-3 group">
+                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.middleName}</Label>
+                    <Input 
+                      defaultValue={currentUser.middleName} 
+                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label>{t.settings.phone}</Label>
-                    <Input defaultValue={currentUser.phone || ""} />
+                  <div className="space-y-3 group">
+                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.phone}</Label>
+                    <Input 
+                      defaultValue={currentUser.phone || ""} 
+                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                    />
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label>{t.settings.email}</Label>
-                    <Input defaultValue="user@gov.uz" type="email" />
+                  <div className="space-y-3 group sm:col-span-2">
+                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.email}</Label>
+                    <Input 
+                      defaultValue="user@gov.uz" 
+                      type="email" 
+                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                    />
                   </div>
                 </div>
 
-                <div className="flex justify-end">
-                  <Button onClick={saveSettings}>
-                    <Save className="mr-2 h-4 w-4" />
+                <div className="flex justify-end pt-6">
+                  <Button 
+                    onClick={saveSettings}
+                    className="h-12 px-8 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  >
+                    <Save className="mr-2 h-5 w-5" />
                     {t.common.save}
                   </Button>
                 </div>
@@ -234,81 +274,124 @@ export default function SettingsPage() {
           </TabsContent>
 
           {/* Notification Settings */}
-          <TabsContent value="notifications">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle>{t.settings.notificationSettings}</CardTitle>
-                <CardDescription>{t.settings.notificationDescription}</CardDescription>
+          <TabsContent value="notifications" className="animate-fade-in">
+            <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl hover:shadow-3xl transition-all duration-500">
+              <CardHeader className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-pink-500/10" />
+                <CardTitle className="relative flex items-center gap-3 text-2xl">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <Bell className="h-4 w-4 text-white" />
+                  </div>
+                  {t.settings.notificationSettings}
+                </CardTitle>
+                <CardDescription className="relative">{t.settings.notificationDescription}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <h4 className="font-medium">{t.settings.notificationChannels}</h4>
+              <CardContent className="space-y-8 p-8">
+                <div className="space-y-6">
+                  <h4 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                    {t.settings.notificationChannels}
+                  </h4>
 
-                  <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <Mail className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-blue-500/5 to-purple-600/5 hover:from-blue-500/10 hover:to-purple-600/10 transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
+                        <Mail className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <p className="font-medium">{t.settings.emailNotifications}</p>
+                        <p className="text-lg font-medium">{t.settings.emailNotifications}</p>
                         <p className="text-sm text-muted-foreground">{t.settings.emailNotificationsDesc}</p>
                       </div>
                     </div>
-                    <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+                    <Switch 
+                      checked={emailNotifications} 
+                      onCheckedChange={setEmailNotifications}
+                      className="scale-125"
+                    />
                   </div>
 
-                  <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-purple-500/5 to-pink-600/5 hover:from-purple-500/10 hover:to-pink-600/10 transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
+                        <MessageSquare className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <p className="font-medium">{t.settings.telegramNotifications}</p>
+                        <p className="text-lg font-medium">{t.settings.telegramNotifications}</p>
                         <p className="text-sm text-muted-foreground">{t.settings.telegramNotificationsDesc}</p>
                       </div>
                     </div>
-                    <Switch checked={telegramNotifications} onCheckedChange={setTelegramNotifications} />
+                    <Switch 
+                      checked={telegramNotifications} 
+                      onCheckedChange={setTelegramNotifications}
+                      className="scale-125"
+                    />
                   </div>
 
-                  <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <Smartphone className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-pink-500/5 to-orange-600/5 hover:from-pink-500/10 hover:to-orange-600/10 transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-orange-600 shadow-lg">
+                        <Smartphone className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <p className="font-medium">{t.settings.pushNotifications}</p>
+                        <p className="text-lg font-medium">{t.settings.pushNotifications}</p>
                         <p className="text-sm text-muted-foreground">{t.settings.pushNotificationsDesc}</p>
                       </div>
                     </div>
-                    <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
+                    <Switch 
+                      checked={pushNotifications} 
+                      onCheckedChange={setPushNotifications}
+                      className="scale-125"
+                    />
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="my-8" />
 
-                <div className="space-y-4">
-                  <h4 className="font-medium">{t.settings.notificationTypes}</h4>
+                <div className="space-y-6">
+                  <h4 className="text-xl font-semibold bg-gradient-to-r from-green-500 to-teal-600 bg-clip-text text-transparent">
+                    {t.settings.taskNotifications}
+                  </h4>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{t.settings.newTasks}</p>
-                      <p className="text-sm text-muted-foreground">{t.settings.newTasksDesc}</p>
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-green-500/5 to-teal-600/5 hover:from-green-500/10 hover:to-teal-600/10 transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-teal-600 shadow-lg">
+                        <AlertCircle className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-medium">{t.settings.newTasks}</p>
+                        <p className="text-sm text-muted-foreground">{t.settings.newTasksDesc}</p>
+                      </div>
                     </div>
-                    <Switch checked={newTaskNotification} onCheckedChange={setNewTaskNotification} />
+                    <Switch 
+                      checked={newTaskNotification} 
+                      onCheckedChange={setNewTaskNotification}
+                      className="scale-125"
+                    />
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{t.settings.deadlineReminders}</p>
-                      <p className="text-sm text-muted-foreground">{t.settings.deadlineRemindersDesc}</p>
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-teal-500/5 to-cyan-600/5 hover:from-teal-500/10 hover:to-cyan-600/10 transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 shadow-lg">
+                        <AlertCircle className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-medium">{t.settings.deadlineReminders}</p>
+                        <p className="text-sm text-muted-foreground">{t.settings.deadlineRemindersDesc}</p>
+                      </div>
                     </div>
-                    <Switch checked={taskDeadlineReminder} onCheckedChange={setTaskDeadlineReminder} />
+                    <Switch 
+                      checked={taskDeadlineReminder} 
+                      onCheckedChange={setTaskDeadlineReminder}
+                      className="scale-125"
+                    />
                   </div>
                 </div>
 
-                <div className="flex justify-end">
-                  <Button onClick={saveSettings}>
-                    <Save className="mr-2 h-4 w-4" />
+                <div className="flex justify-end pt-6">
+                  <Button 
+                    onClick={saveSettings}
+                    className="h-12 px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-500/90 hover:to-purple-600/90 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  >
+                    <Save className="mr-2 h-5 w-5" />
                     {t.common.save}
                   </Button>
                 </div>
@@ -384,16 +467,6 @@ export default function SettingsPage() {
                 <CardDescription>{t.settings.appearanceDescription}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{t.settings.darkMode}</p>
-                    <p className="text-sm text-muted-foreground">{t.settings.darkModeDesc}</p>
-                  </div>
-                  <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-                </div>
-
-                <Separator />
-
                 <div className="space-y-2">
                   <Label>{t.settings.language}</Label>
                   <Select value={language} onValueChange={(v) => setLanguage(v)}>
@@ -402,9 +475,9 @@ export default function SettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="uz">Ўзбек тили</SelectItem>
+                      <SelectItem value="uz">O'zbek tili (lotin)</SelectItem>
+                      <SelectItem value="uz-cyrl">Ўзбек тили (кирилл)</SelectItem>
                       <SelectItem value="ru">Русский</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -535,17 +608,16 @@ export default function SettingsPage() {
                           onChange={(e) => setSmtpPort(e.target.value)}
                         />
                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="senderEmail">{t.settings.senderEmail}</Label>
-                      <Input
-                        id="senderEmail"
-                        type="email"
-                        placeholder="noreply@hokimlik.uz"
-                        value={senderEmail}
-                        onChange={(e) => setSenderEmail(e.target.value)}
-                      />
+                      <div className="space-y-2">
+                        <Label htmlFor="senderEmail">{t.settings.senderEmail}</Label>
+                        <Input
+                          id="senderEmail"
+                          type="email"
+                          placeholder="noreply@hokimlik.uz"
+                          value={senderEmail}
+                          onChange={(e) => setSenderEmail(e.target.value)}
+                        />
+                      </div>
                     </div>
 
                     <div className="flex justify-end">
@@ -559,7 +631,58 @@ export default function SettingsPage() {
               </div>
             </TabsContent>
           )}
-        </Tabs>
+          
+          {/* Email SMTP Settings */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                {t.settings.emailSettings}
+              </CardTitle>
+              <CardDescription>{t.settings.emailSettingsDesc}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="smtpHost">{t.settings.smtpServer}</Label>
+                  <Input
+                    id="smtpHost"
+                    placeholder="smtp.example.com"
+                    value={smtpHost}
+                    onChange={(e) => setSmtpHost(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="smtpPort">{t.settings.port}</Label>
+                  <Input
+                    id="smtpPort"
+                    placeholder="587"
+                    value={smtpPort}
+                    onChange={(e) => setSmtpPort(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="senderEmail">{t.settings.senderEmail}</Label>
+                <Input
+                  id="senderEmail"
+                  type="email"
+                  placeholder="noreply@hokimlik.uz"
+                  value={senderEmail}
+                  onChange={(e) => setSenderEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button>
+                  <Save className="mr-2 h-4 w-4" />
+                  {t.common.save}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </div>
     </>
   )
