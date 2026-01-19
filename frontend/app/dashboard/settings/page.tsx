@@ -127,136 +127,125 @@ export default function SettingsPage() {
   return (
     <React.Fragment>
       <Header title={t.settings.title} description={t.settings.description} />
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-6">
-        {/* Animated background elements */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full animate-float" />
-          <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/10 rounded-full animate-float" style={{ animationDelay: "1s" }} />
-          <div className="absolute bottom-32 left-40 w-20 h-20 bg-pink-500/10 rounded-full animate-float" style={{ animationDelay: "2s" }} />
-          <div className="absolute bottom-20 right-20 w-28 h-28 bg-green-500/10 rounded-full animate-float" style={{ animationDelay: "3s" }} />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <Tabs defaultValue="profile" className="space-y-8">
-            <TabsList className="relative w-full grid grid-cols-5 lg:w-[600px] mx-auto bg-background/80 backdrop-blur-xl border border-border/50 rounded-2xl p-1 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 rounded-2xl opacity-50" />
-              
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="flex space-x-1 border-b border-gray-200">
               <TabsTrigger 
                 value="profile" 
-                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.settings.profile}</span>
+                <User className="h-4 w-4 mr-2" />
+                {t.settings.profile}
               </TabsTrigger>
               
               <TabsTrigger 
                 value="notifications" 
-                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Bell className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.settings.notifications}</span>
+                <Bell className="h-4 w-4 mr-2" />
+                {t.settings.notifications}
               </TabsTrigger>
               
               <TabsTrigger 
                 value="security" 
-                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.settings.security}</span>
+                <Shield className="h-4 w-4 mr-2" />
+                {t.settings.security}
               </TabsTrigger>
               
               <TabsTrigger 
                 value="appearance" 
-                className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Globe className="h-4 w-4" />
-                <span className="hidden sm:inline">{t.settings.appearance}</span>
+                <Globe className="h-4 w-4 mr-2" />
+                {t.settings.appearance}
               </TabsTrigger>
               
               {isAdmin && (
                 <TabsTrigger 
                   value="admin" 
-                  className="relative gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
                 >
-                  <Settings className="h-4 w-4" />
-                  <span className="hidden sm:inline">{t.settings.admin}</span>
+                  <Settings className="h-4 w-4 mr-2" />
+                  {t.settings.admin}
                 </TabsTrigger>
               )}
             </TabsList>
 
           {/* Profile Settings */}
-          <TabsContent value="profile" className="animate-fade-in">
-            <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl hover:shadow-3xl transition-all duration-500">
-              <CardHeader className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10" />
-                <CardTitle className="relative flex items-center gap-3 text-2xl">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                    <User className="h-4 w-4 text-white" />
-                  </div>
-                  {t.settings.profileInfo}
+          <TabsContent value="profile" className="mt-6">
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">
+                  {t.settings.profile}
                 </CardTitle>
-                <CardDescription className="relative">{t.settings.profileDescription}</CardDescription>
+                <CardDescription className="text-gray-600">
+                  {t.settings.profileDescription}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-8 p-8">
-                <div className="flex items-center gap-8 p-6 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl border border-primary/20">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24 ring-4 ring-primary/30 ring-offset-4 ring-offset-transparent">
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-3xl font-bold animate-pulse-modern">
-                        {currentUser.firstName[0]}
-                        {currentUser.lastName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white animate-bounce-subtle" />
+              <CardContent className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback className="bg-blue-600 text-white text-lg font-medium">
+                      AK
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">Abdulla Karimov</h3>
+                    <p className="text-sm text-gray-600">admin@ehokimiyat.uz</p>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                      {currentUser.firstName} {currentUser.lastName}
-                    </h3>
-                    <p className="text-lg text-muted-foreground">{currentUser.role}</p>
-                    <Badge variant="outline" className="mt-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-primary border-primary/30 px-4 py-2">
-                      <UserCheck className="mr-2 h-4 w-4" />
-                      {t.settings.oneIDConnected}
-                    </Badge>
-                  </div>
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white animate-bounce-subtle" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    {currentUser.firstName} {currentUser.lastName}
+                  </h3>
+                  <p className="text-lg text-muted-foreground">{currentUser.role}</p>
+                  <Badge variant="outline" className="mt-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-primary border-primary/30 px-4 py-2">
+                    <UserCheck className="mr-2 h-4 w-4" />
+                    {t.settings.oneIDConnected}
+                  </Badge>
                 </div>
 
                 <Separator className="my-8" />
 
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <div className="space-y-3 group">
-                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.firstName}</Label>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-gray-700">{t.settings.firstName}</Label>
                     <Input 
                       defaultValue={currentUser.firstName} 
-                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                      className="h-12 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                     />
                   </div>
-                  <div className="space-y-3 group">
-                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.lastName}</Label>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-gray-700">{t.settings.lastName}</Label>
                     <Input 
                       defaultValue={currentUser.lastName} 
-                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                      className="h-12 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                     />
                   </div>
-                  <div className="space-y-3 group">
-                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.middleName}</Label>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-gray-700">{t.settings.middleName}</Label>
                     <Input 
                       defaultValue={currentUser.middleName} 
-                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                      className="h-12 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                     />
                   </div>
-                  <div className="space-y-3 group">
-                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.phone}</Label>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-gray-700">{t.settings.phone}</Label>
                     <Input 
                       defaultValue={currentUser.phone || ""} 
-                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                      className="h-12 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                     />
                   </div>
-                  <div className="space-y-3 group sm:col-span-2">
-                    <Label className="text-base font-medium group-hover:text-primary transition-colors">{t.settings.email}</Label>
+                  <div className="space-y-3 sm:col-span-2">
+                    <Label className="text-sm font-medium text-gray-700">{t.settings.email}</Label>
                     <Input 
                       defaultValue="user@gov.uz" 
                       type="email" 
-                      className="h-12 text-base border-2 border-border/50 focus:border-primary transition-all duration-300 hover:border-primary/50"
+                      className="h-12 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -351,7 +340,6 @@ export default function SettingsPage() {
                   <h4 className="text-xl font-semibold bg-gradient-to-r from-green-500 to-teal-600 bg-clip-text text-transparent">
                     {t.settings.notificationTypes}
                   </h4>
-
                   <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-green-500/5 to-teal-600/5 hover:from-green-500/10 hover:to-teal-600/10 transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-teal-600 shadow-lg">
@@ -369,7 +357,7 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-teal-500/5 to-cyan-600/5 hover:from-teal-500/10 hover:to-cyan-600/10 transition-all duration-300">
+                <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-teal-500/5 to-cyan-600/5 hover:from-teal-500/10 hover:to-cyan-600/10 transition-all duration-300">
                     <div className="flex items-center gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 shadow-lg">
                         <AlertCircle className="h-6 w-6 text-white" />
@@ -629,131 +617,6 @@ export default function SettingsPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-            </TabsContent>
-          )}
-          
-          {isAdmin && (
-            <TabsContent value="admin">
-              <div className="space-y-6">
-                {/* Telegram Bot Settings */}
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Bot className="h-5 w-5" />
-                      {t.settings.telegramBotSettings}
-                    </CardTitle>
-                    <CardDescription>{t.settings.telegramBotDesc}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="botToken">{t.settings.botToken}</Label>
-                        <div className="relative">
-                          <Input
-                            id="botToken"
-                            type={showToken ? "text" : "password"}
-                            placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
-                            value={botToken}
-                            onChange={(e) => setBotToken(e.target.value)}
-                            className="pr-10"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                            onClick={() => setShowToken(!showToken)}
-                          >
-                            {showToken ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                        <p className="text-xs text-muted-foreground">{t.settings.botTokenDesc}</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="botUsername">{t.settings.botUsername}</Label>
-                        <div className="flex">
-                          <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-border bg-muted text-muted-foreground text-sm">
-                            @
-                          </span>
-                          <Input
-                            id="botUsername"
-                            placeholder="hokimlik_bot"
-                            value={botUsername}
-                            onChange={(e) => setBotUsername(e.target.value)}
-                            className="rounded-l-none"
-                          />
-                        </div>
-                        <p className="text-xs text-muted-foreground">{t.settings.botUsernameDesc}</p>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="flex justify-end">
-                      <Button onClick={saveBotSettings}>
-                        <Save className="mr-2 h-4 w-4" />
-                        {t.common.save}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Email SMTP Settings */}
-                <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5" />
-                {t.settings.emailSettings}
-              </CardTitle>
-              <CardDescription>{t.settings.emailSettingsDesc}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="smtpHost">{t.settings.smtpServer}</Label>
-                  <Input
-                    id="smtpHost"
-                    placeholder="smtp.example.com"
-                    value={smtpHost}
-                    onChange={(e) => setSmtpHost(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="smtpPort">{t.settings.port}</Label>
-                  <Input
-                    id="smtpPort"
-                    placeholder="587"
-                    value={smtpPort}
-                    onChange={(e) => setSmtpPort(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="senderEmail">{t.settings.senderEmail}</Label>
-                <Input
-                  id="senderEmail"
-                  type="email"
-                  placeholder="noreply@hokimlik.uz"
-                  value={senderEmail}
-                  onChange={(e) => setSenderEmail(e.target.value)}
-                />
-              </div>
-
-              <div className="flex justify-end">
-                <Button>
-                  <Save className="mr-2 h-4 w-4" />
-                  {t.common.save}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
               </div>
             </TabsContent>
           )}
