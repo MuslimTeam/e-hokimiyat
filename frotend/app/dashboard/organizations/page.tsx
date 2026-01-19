@@ -1,6 +1,5 @@
 "use client"
 
-import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -71,7 +70,6 @@ export default function OrganizationsPage() {
 
   return (
     <>
-      <Header title="Ташкилотлар" description="Туман ташкилотлари ва уларнинг кўрсаткичлари" />
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

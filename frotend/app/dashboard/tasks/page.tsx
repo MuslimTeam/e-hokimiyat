@@ -1,6 +1,5 @@
 "use client"
 
-import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -31,13 +30,77 @@ export default function TasksPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
   const [sectorFilter, setSectorFilter] = useState<string>("all")
+  const [deadlineFilter, setDeadlineFilter] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [selectedOrgs, setSelectedOrgs] = useState<string[]>([])
   const [selectedSector, setSelectedSector] = useState<string>("")
+  const [selectedPriority, setSelectedPriority] = useState<string>("")
+  const [taskDeadline, setTaskDeadline] = useState<string>("")
 
   const [tasks, setTasks] = useState<any[]>([])
   const [orgsMap, setOrgsMap] = useState<Record<string, any>>({})
+
+  // Auto-calculate deadline based on priority
+  const handlePriorityChange = (priority: string) => {
+    console.log("Priority changed to:", priority)
+    setSelectedPriority(priority)
+    
+    // Always auto-calculate when priority changes
+    if (priority) {
+      const today = new Date()
+      const deadline = new Date(today)
+      switch (priority) {
+        case "MUHIM_SHOSHILINCH":
+          deadline.setDate(today.getDate() + 1)
+          console.log("Setting deadline to +1 day:", deadline)
+          break
+        case "MUHIM":
+          deadline.setDate(today.getDate() + 3)
+          console.log("Setting deadline to +3 days:", deadline)
+          break
+        case "SHOSHILINCH_EMAS":
+          deadline.setDate(today.getDate() + 5)
+          console.log("Setting deadline to +5 days:", deadline)
+          break
+        case "ODDIY":
+          deadline.setDate(today.getDate() + 7)
+          console.log("Setting deadline to +7 days:", deadline)
+          break
+      }
+      // Format date as YYYY-MM-DD
+      const year = deadline.getFullYear()
+      const month = String(deadline.getMonth() + 1).padStart(2, '0')
+      const day = String(deadline.getDate()).padStart(2, '0')
+      const deadlineString = `${year}-${month}-${day}`
+      console.log("Final deadline string:", deadlineString)
+      setTaskDeadline(deadlineString)
+    }
+  }
+
+  // Handle manual deadline change
+  const handleDeadlineChange = (date: string) => {
+    console.log("Manual deadline change to:", date)
+    
+    // Validate and format date
+    if (date) {
+      // Ensure the date is in YYYY-MM-DD format
+      const dateObj = new Date(date)
+      if (!isNaN(dateObj.getTime())) {
+        const year = dateObj.getFullYear()
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+        const day = String(dateObj.getDate()).padStart(2, '0')
+        const formattedDate = `${year}-${month}-${day}`
+        console.log("Formatted date:", formattedDate)
+        setTaskDeadline(formattedDate)
+      } else {
+        console.log("Invalid date format")
+        setTaskDeadline("")
+      }
+    } else {
+      setTaskDeadline("")
+    }
+  }
 
   const filteredTasks = tasks.filter((task) => {
     const matchesStatus = statusFilter === "all" || task.status === statusFilter
@@ -46,11 +109,78 @@ export default function TasksPage() {
     const matchesSearch =
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (task.description || "").toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesStatus && matchesPriority && matchesSector && matchesSearch
+    
+    // Deadline filtering
+    let matchesDeadline = true
+    if (deadlineFilter !== "all") {
+      const today = new Date()
+      const deadlineDate = new Date(task.deadline)
+      const diffDays = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      
+      switch (deadlineFilter) {
+        case "overdue":
+          matchesDeadline = diffDays < 0
+          break
+        case "today":
+          matchesDeadline = diffDays === 0
+          break
+        case "3days":
+          matchesDeadline = diffDays > 0 && diffDays <= 3
+          break
+        case "week":
+          matchesDeadline = diffDays > 0 && diffDays <= 7
+          break
+        case "month":
+          matchesDeadline = diffDays > 0 && diffDays <= 30
+          break
+      }
+    }
+    
+    return matchesStatus && matchesPriority && matchesSector && matchesSearch && matchesDeadline
   })
 
   const toggleOrg = (orgId: string) => {
     setSelectedOrgs((prev) => (prev.includes(orgId) ? prev.filter((id) => id !== orgId) : [...prev, orgId]))
+  }
+
+  // Reset form when dialog closes
+  const resetForm = () => {
+    setSelectedPriority("")
+    setTaskDeadline("")
+    setSelectedSector("")
+    setSelectedOrgs([])
+  }
+
+  const handleCreateTask = () => {
+    // Get form values
+    const titleInput = document.getElementById('taskTitle') as HTMLInputElement
+    const descriptionInput = document.getElementById('taskDescription') as HTMLTextAreaElement
+    
+    if (!titleInput?.value || !descriptionInput?.value || !selectedPriority || !taskDeadline || !selectedSector || selectedOrgs.length === 0) {
+      alert('Илтимос, барча мажбурий майдонларни тўлдиринг!')
+      return
+    }
+
+    // Create new task object
+    const newTask = {
+      id: Date.now().toString(),
+      title: titleInput.value,
+      description: descriptionInput.value,
+      priority: selectedPriority,
+      deadline: taskDeadline,
+      sector: selectedSector,
+      organizations: selectedOrgs,
+      status: "YANGI",
+      createdAt: new Date().toISOString(),
+      createdBy: "1"
+    }
+
+    // Add to tasks list
+    setTasks(prev => [...prev, newTask])
+    
+    // Reset form and close dialog
+    resetForm()
+    setIsCreateOpen(false)
   }
 
   useEffect(() => {
@@ -71,7 +201,6 @@ export default function TasksPage() {
 
   return (
     <>
-      <Header title="Топшириқлар" description="Барча топшириқлар рўйхати ва бошқаруви" />
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -146,22 +275,143 @@ export default function TasksPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    <Select value={deadlineFilter} onValueChange={setDeadlineFilter}>
+                      <SelectTrigger className="w-full md:w-[160px] input-modern">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        <SelectValue placeholder="Муддат" />
+                      </SelectTrigger>
+                      <SelectContent className="glass">
+                        <SelectItem value="all">Барча муддатлар</SelectItem>
+                        <SelectItem value="overdue">Кечикган</SelectItem>
+                        <SelectItem value="today">Бугун</SelectItem>
+                        <SelectItem value="3days">3 кунгача</SelectItem>
+                        <SelectItem value="week">Ҳафтагача</SelectItem>
+                        <SelectItem value="month">Ойгача</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                  <Dialog open={isCreateOpen} onOpenChange={(open) => {
+    setIsCreateOpen(open)
+    if (!open) {
+      resetForm()
+    }
+  }}>
                     <DialogTrigger asChild>
                       <Button className="btn-modern">
                         <Plus className="mr-2 h-4 w-4" />
                         Янги топшириқ
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto glass">
+                    <DialogContent className="sm:max-w-[600px] max-h-[75vh] overflow-y-auto glass my-4">
                       <DialogHeader>
                         <DialogTitle className="text-gradient-animated">Янги топшириқ яратиш</DialogTitle>
                         <DialogDescription>
                           Топшириқ маълумотларини киритинг ва ташкилотларни танланг
                         </DialogDescription>
                       </DialogHeader>
-                      {/* Dialog content remains the same */}
+                      <div className="space-y-6 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="taskTitle">Топшириқ сарлавҳаси *</Label>
+                          <Input
+                            id="taskTitle"
+                            placeholder="Топшириқ сарлавҳасини киритинг..."
+                            className="input-modern"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="taskDescription">Топшириқ тавсифи *</Label>
+                          <Textarea
+                            id="taskDescription"
+                            placeholder="Топшириқ ҳақида тўлиқ маълумот..."
+                            className="input-modern min-h-[100px]"
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="taskPriority">Устуворлик *</Label>
+                            <Select value={selectedPriority} onValueChange={handlePriorityChange}>
+                              <SelectTrigger className="input-modern text-xs h-10">
+                                <SelectValue placeholder="Устуворликни танланг" />
+                              </SelectTrigger>
+                              <SelectContent className="glass" position="popper" sideOffset={10} avoidCollisions={true}>
+                                {(Object.keys(priorityLabels) as TaskPriority[]).map((priority) => (
+                                  <SelectItem key={priority} value={priority}>
+                                    {priorityLabels[priority]}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="taskDeadline">Муддат *</Label>
+                            <Input
+                              id="taskDeadline"
+                              type="date"
+                              value={taskDeadline}
+                              onChange={(e) => handleDeadlineChange(e.target.value)}
+                              className="input-modern z-10"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="taskSector">Сохалар *</Label>
+                          <Select value={selectedSector} onValueChange={setSelectedSector}>
+                            <SelectTrigger className="input-modern">
+                              <SelectValue placeholder="Сохаларни танланг" />
+                            </SelectTrigger>
+                            <SelectContent className="glass" position="popper" sideOffset={10} avoidCollisions={true}>
+                              {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
+                                <SelectItem key={sector} value={sector}>
+                                  {sectorLabels[sector]}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Ташкилотлар *</Label>
+                          <div className="space-y-3 max-h-[200px] overflow-y-auto p-2 border border-border/50 rounded-lg bg-muted/30">
+                            {Object.values(orgsMap).map((org) => (
+                              <div key={org.id} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`org-${org.id}`}
+                                  checked={selectedOrgs.includes(org.id)}
+                                  onCheckedChange={() => toggleOrg(org.id)}
+                                />
+                                <Label 
+                                  htmlFor={`org-${org.id}`}
+                                  className="text-sm font-normal cursor-pointer"
+                                >
+                                  {org.name}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            resetForm()
+                            setIsCreateOpen(false)
+                          }}
+                        >
+                          Бекор қилиш
+                        </Button>
+                        <Button 
+                          onClick={handleCreateTask}
+                          className="btn-modern"
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Топшириқ яратиш
+                        </Button>
+                      </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>

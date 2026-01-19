@@ -83,8 +83,8 @@ export default function DashboardPage() {
                 <span className="text-white font-bold">📋</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground">Сўнгги топшириқлар</h3>
-                <p className="text-sm text-muted-foreground">Янги қўшилган ва ўзгартирилган топшириқлар</p>
+                <h3 className="text-xl font-bold text-foreground">Муддати яқинлашаётган топшириқлар</h3>
+                <p className="text-sm text-muted-foreground">Ижро муддати яқинлашиб бораётган фаол топшириқлар</p>
               </div>
             </div>
             <RecentTasks />

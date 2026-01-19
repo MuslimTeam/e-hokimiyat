@@ -9,7 +9,7 @@ export type TaskStatus =
   | "MUDDATI_KECH"
   | "BAJARILMADI"
   | "NAZORATDAN_YECHILDI"
-export type TaskPriority = "MUHIM_SHOSHILINCH" | "MUHIM" | "ODDIY"
+export type TaskPriority = "MUHIM_SHOSHILINCH" | "MUHIM" | "SHOSHILINCH_EMAS" | "ODDIY"
 export type UserRole = "TUMAN_HOKIMI" | "HOKIMLIK_MASUL" | "TASHKILOT_RAHBAR" | "TASHKILOT_MASUL" | "ADMIN"
 export type CabinetType = "HOKIMLIK" | "TASHKILOT" | "ADMIN"
 
@@ -212,9 +212,24 @@ export const taskStatusLabels: Record<TaskStatus, string> = {
 }
 
 export const priorityLabels: Record<TaskPriority, string> = {
-  MUHIM_SHOSHILINCH: "Muhim va shoshilinch",
-  MUHIM: "Muhim",
-  ODDIY: "Oddiy",
+  MUHIM_SHOSHILINCH: "1. MUHIM VA SHOSHILINCH",
+  MUHIM: "2. MUHIM, LEKIN SHOSHILINCH EMAS",
+  SHOSHILINCH_EMAS: "3. SHOSHILINCH, LEKIN MUHIM EMAS",
+  ODDIY: "4. MUHIM EMAS VA SHOSHILINCH EMAS",
+}
+
+export const priorityDeadlines: Record<TaskPriority, number> = {
+  MUHIM_SHOSHILINCH: 1, // 1 kun
+  MUHIM: 3, // 3 kun
+  SHOSHILINCH_EMAS: 5, // 5 kun
+  ODDIY: 7, // 7 kun
+}
+
+export const priorityDescriptions: Record<TaskPriority, string> = {
+  MUHIM_SHOSHILINCH: "darhol bajarilishi lozim bo'lgan masalalar, favqulodda holatlar va jamoatchilikka ta'siri yuqori bo'lgan vaziyatlar",
+  MUHIM: "strategik va tizimli masalalar, reja asosida bajariladi, o'z vaqtida bajarilmasa, keyinchalik favqulodda holatga aylanishi mumkin",
+  SHOSHILINCH_EMAS: "texnik va operatsion xarakterdagi ishlar, vakolatli mas'ullarga topshiriladi, hokim aralashuvi talab etilmaydi",
+  ODDIY: "ikkilamchi va fon rejimidagi ishlar, minimal nazorat ostida bo'ladi, umumiy ish yuklamasini tahlil qilishda hisobga olinadi",
 }
 
 export const mockUsers: User[] = [
@@ -453,7 +468,7 @@ export const mockTasks: Task[] = [
     id: "4",
     title: "Tibbiyot punkti jihozlash",
     description: "Qishloq tibbiyot punktiga zamonaviy tibbiy jihozlar yetkazib berish",
-    priority: "ODDIY",
+    priority: "SHOSHILINCH_EMAS",
     status: "NAZORATDAN_YECHILDI",
     sector: "SOGLIQNI_SAQLASH",
     deadline: "2026-01-20",
@@ -489,7 +504,7 @@ export const mockTasks: Task[] = [
     id: "7",
     title: "Ishsizlarni ro'yxatga olish",
     description: "Bandlik markazida ishsiz fuqarolarni qayta ro'yxatga olish va treninglar tashkil etish",
-    priority: "ODDIY",
+    priority: "SHOSHILINCH_EMAS",
     status: "IJRODA",
     sector: "BANDLIK_MEHNAT",
     deadline: "2026-02-20",
@@ -513,7 +528,7 @@ export const mockTasks: Task[] = [
     id: "9",
     title: "Ekologik tekshiruv o'tkazish",
     description: "Sanoat korxonalarida ekologik monitoring o'tkazish",
-    priority: "ODDIY",
+    priority: "SHOSHILINCH_EMAS",
     status: "YANGI",
     sector: "EKOLOGIYA",
     deadline: "2026-02-28",

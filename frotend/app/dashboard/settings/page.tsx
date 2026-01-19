@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -124,7 +125,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <>
+    <React.Fragment>
       <Header title={t.settings.title} description={t.settings.description} />
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-6">
         {/* Animated background elements */}
@@ -348,7 +349,7 @@ export default function SettingsPage() {
 
                 <div className="space-y-6">
                   <h4 className="text-xl font-semibold bg-gradient-to-r from-green-500 to-teal-600 bg-clip-text text-transparent">
-                    {t.settings.taskNotifications}
+                    {t.settings.notificationTypes}
                   </h4>
 
                   <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-green-500/5 to-teal-600/5 hover:from-green-500/10 hover:to-teal-600/10 transition-all duration-300">
@@ -632,8 +633,79 @@ export default function SettingsPage() {
             </TabsContent>
           )}
           
-          {/* Email SMTP Settings */}
-          <Card className="bg-card border-border">
+          {isAdmin && (
+            <TabsContent value="admin">
+              <div className="space-y-6">
+                {/* Telegram Bot Settings */}
+                <Card className="bg-card border-border">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Bot className="h-5 w-5" />
+                      {t.settings.telegramBotSettings}
+                    </CardTitle>
+                    <CardDescription>{t.settings.telegramBotDesc}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="botToken">{t.settings.botToken}</Label>
+                        <div className="relative">
+                          <Input
+                            id="botToken"
+                            type={showToken ? "text" : "password"}
+                            placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
+                            value={botToken}
+                            onChange={(e) => setBotToken(e.target.value)}
+                            className="pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowToken(!showToken)}
+                          >
+                            {showToken ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{t.settings.botTokenDesc}</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="botUsername">{t.settings.botUsername}</Label>
+                        <div className="flex">
+                          <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-border bg-muted text-muted-foreground text-sm">
+                            @
+                          </span>
+                          <Input
+                            id="botUsername"
+                            placeholder="hokimlik_bot"
+                            value={botUsername}
+                            onChange={(e) => setBotUsername(e.target.value)}
+                            className="rounded-l-none"
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">{t.settings.botUsernameDesc}</p>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex justify-end">
+                      <Button onClick={saveBotSettings}>
+                        <Save className="mr-2 h-4 w-4" />
+                        {t.common.save}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Email SMTP Settings */}
+                <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5" />
@@ -682,8 +754,12 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+              </div>
+            </TabsContent>
+          )}
+        </Tabs>
+        </div>
       </div>
-    </>
+    </React.Fragment>
   )
 }
