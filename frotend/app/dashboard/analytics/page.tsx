@@ -1,6 +1,6 @@
 "use client"
 
-import { Header } from "@/components/layout/header"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -130,7 +130,6 @@ const metrics = [
 
   return (
     <>
-      <Header title="Analitika" description="Tizim ko'rsatkichlari va statistik tahlil" />
       <div className="p-6 space-y-6">
         {/* Time Filter */}
         <div className="flex justify-end">

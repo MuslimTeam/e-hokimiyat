@@ -103,15 +103,6 @@ export function Sidebar() {
         to: "#2563eb"
       },
     },
-    {
-      title: "Аудит журнали",
-      href: "/dashboard/audit",
-      icon: FileText,
-      gradient: {
-        from: "#6366f1",
-        to: "#9333ea"
-      },
-    },
   ]
 
   return (
@@ -236,6 +227,13 @@ export function Sidebar() {
           
           {/* Hover glow */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+          
+          {/* Click handler */}
+          <div 
+            className="absolute inset-0 cursor-pointer" 
+            onClick={() => window.open('mailto:admin@ehokimiyat.uz', '_blank')}
+            title="Админ билан боғланиш"
+          />
         </div>
 
         {/* Settings */}

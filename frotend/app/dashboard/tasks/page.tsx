@@ -1,6 +1,5 @@
 "use client"
 
-import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -202,7 +201,6 @@ export default function TasksPage() {
 
   return (
     <>
-      <Header title="Топшириқлар" description="Барча топшириқлар рўйхати ва бошқаруви" />
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
