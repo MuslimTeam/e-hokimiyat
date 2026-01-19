@@ -23,7 +23,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 export function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
 
   useEffect(() => {
     const handleResize = () => {
@@ -44,93 +43,57 @@ export function Sidebar() {
       title: "Бош саҳифа",
       href: "/dashboard",
       icon: LayoutDashboard,
-      gradient: {
-        from: "#3b82f6",
-        to: "#9333ea"
-      },
     },
     {
       title: "Топшириқлар",
       href: "/dashboard/tasks",
       icon: ClipboardList,
-      gradient: {
-        from: "#10b981",
-        to: "#059669"
-      },
     },
     {
       title: "Фойдаланувчилар",
       href: "/dashboard/users",
       icon: Users,
-      gradient: {
-        from: "#f97316",
-        to: "#dc2626"
-      },
     },
     {
       title: "Ташкилотлар",
       href: "/dashboard/organizations",
       icon: Building2,
-      gradient: {
-        from: "#a855f7",
-        to: "#ec4899"
-      },
     },
     {
       title: "Билдиришномалар",
       href: "/dashboard/notifications",
       icon: Bell,
-      gradient: {
-        from: "#ec4899",
-        to: "#f43f5e"
-      },
     },
     {
       title: "Мурожаатлар",
       href: "/dashboard/appeals",
       icon: MessageSquare,
-      gradient: {
-        from: "#8b5cf6",
-        to: "#6366f1"
-      },
     },
     {
       title: "Аналитика",
       href: "/dashboard/analytics",
       icon: BarChart3,
-      gradient: {
-        from: "#06b6d4",
-        to: "#2563eb"
-      },
     },
   ]
 
   return (
     <div
       className={cn(
-        "relative flex h-screen flex-col transition-all duration-500 bg-background",
+        "relative flex h-screen flex-col bg-white border-r border-gray-200 transition-all duration-250",
         collapsed ? "w-20" : "w-72"
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 opacity-0 transition-opacity duration-500" 
-           style={{ opacity: isHovered ? 1 : 0 }} />
       
       {/* Header */}
-      <div className="relative z-10 flex h-20 items-center justify-between border-b border-white/20 bg-white/10 backdrop-blur-xl transition-all duration-500">
+      <div className="relative z-10 flex h-16 items-center justify-between border-b border-gray-200 bg-white transition-all duration-250">
         {!collapsed && (
-          <div className="flex items-center gap-3 animate-slide-up">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center animate-pulse-modern shadow-lg">
-                <span className="text-white font-bold text-lg">ЭХ</span>
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-green-400 to-green-600 rounded-full animate-bounce-subtle"></div>
+          <div className="flex items-center gap-3 px-4">
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">ЭХ</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gradient-animated">e-hokimiyat</h1>
-              <p className="text-xs text-foreground/80">Электрон ҳокимият платформаси</p>
+              <h1 className="text-lg font-semibold text-gray-900">e-hokimiyat</h1>
+              <p className="text-xs text-gray-500">Электрон ҳокимият платформаси</p>
             </div>
           </div>
         )}
@@ -139,61 +102,49 @@ export function Sidebar() {
           variant="ghost"
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
-          className="relative z-20 h-10 w-10 transition-all duration-300 hover:scale-110 hover:bg-white/20 rounded-xl"
+          className="h-8 w-8 transition-all duration-250 hover:bg-emerald-50 hover:text-emerald-600 rounded-md mx-2"
         >
           <ChevronLeft className={cn(
-            "h-5 w-5 transition-transform duration-300",
+            "h-4 w-4 transition-transform duration-250 text-gray-600",
             collapsed ? "rotate-180" : ""
           )} />
-          {/* Glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
         </Button>
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 flex-1 p-4 space-y-6">
+      <nav className="relative z-10 flex-1 p-4 space-y-3">
         {navItems.map((item, index) => {
           const isActive = pathname === item.href
           return (
             <Link key={item.href} href={item.href}>
               <div
                 className={cn(
-                  "group relative flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 hover-lift",
+                  "group relative flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-250 ease-in-out",
                   isActive
-                    ? "text-white shadow-lg"
-                    : "text-foreground hover:text-white",
-                  collapsed && "justify-center"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-gray-600 hover:bg-emerald-50 hover:text-emerald-700",
+                  collapsed && "justify-center px-3"
                 )}
-                style={{ 
-                  animationDelay: `${index * 100}ms`,
-                  background: isActive ? `linear-gradient(135deg, ${item.gradient.from}, ${item.gradient.to})` : 'transparent'
-                }}
               >
-                {/* Hover background */}
-                <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
-                     style={{ backgroundImage: `linear-gradient(135deg, ${item.gradient.from}, ${item.gradient.to})` }} />
-                
                 <item.icon className={cn(
-                  "h-5 w-5 transition-all duration-300 z-10",
-                  isActive ? "text-white animate-pulse-modern" : "text-muted-foreground group-hover:text-white"
+                  "h-5 w-5 flex-shrink-0 transition-colors duration-250",
+                  isActive ? "text-white" : "text-gray-500 group-hover:text-emerald-700"
                 )} />
                 
                 {!collapsed && (
-                  <>
-                    <span className={cn(
-                      "transition-all duration-300 z-10",
-                      isActive ? "text-white font-bold" : "text-foreground group-hover:text-white"
-                    )}>
-                      {item.title}
-                    </span>
-                    
-                    {/* Active indicator */}
-                    {isActive && (
-                      <div className="ml-auto z-10">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse-modern"></div>
-                      </div>
-                    )}
-                  </>
+                  <span className={cn(
+                    "truncate transition-colors duration-250",
+                    isActive ? "text-white font-semibold" : "text-gray-600 group-hover:text-emerald-700"
+                  )}>
+                    {item.title}
+                  </span>
+                )}
+                
+                {/* Active indicator */}
+                {isActive && !collapsed && (
+                  <div className="ml-auto">
+                    <div className="w-2 h-2 bg-white rounded-full opacity-90"></div>
+                  </div>
                 )}
               </div>
             </Link>
@@ -202,61 +153,45 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="relative z-10 border-t border-border bg-background/95 backdrop-blur-xl p-4 transition-all duration-500">
+      <div className="border-t border-gray-200 bg-white p-4">
         {/* User Profile */}
         <div className={cn(
-          "group relative flex items-center gap-4 rounded-2xl p-4 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-xl transition-all duration-300 hover-lift mb-4",
+          "group relative flex items-center gap-3 rounded-lg p-3 bg-emerald-50 transition-all duration-250 hover:bg-emerald-100",
           collapsed && "justify-center"
         )}>
-          <Avatar className="h-12 w-12 ring-4 ring-primary/50 ring-offset-4 ring-offset-transparent transition-all duration-300 group-hover:ring-primary/80 group-hover:scale-110">
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-lg font-bold animate-pulse-modern">
+          <Avatar className="h-10 w-10">
+            <AvatarFallback className="bg-emerald-600 text-white text-sm font-semibold">
               АК
             </AvatarFallback>
           </Avatar>
           
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-foreground truncate group-hover:text-foreground transition-colors duration-300">
+              <p className="text-sm font-medium text-gray-900 truncate">
                 Абдулла Каримов
               </p>
-              <p className="text-xs text-muted-foreground truncate group-hover:text-muted-foreground/80 transition-colors duration-300">
+              <p className="text-xs text-gray-500 truncate">
                 admin@ehokimiyat.uz
               </p>
             </div>
           )}
-          
-          {/* Hover glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
-          
-          {/* Click handler */}
-          <div 
-            className="absolute inset-0 cursor-pointer" 
-            onClick={() => window.open('mailto:admin@ehokimiyat.uz', '_blank')}
-            title="Админ билан боғланиш"
-          />
         </div>
 
         {/* Settings */}
-        <Link href="/dashboard/settings">
+        <Link href="/dashboard/settings" className="block mt-3">
           <div
             className={cn(
-              "group relative flex items-center justify-end gap-4 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300 hover-lift",
-              collapsed && "justify-center"
+              "group relative flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 transition-all duration-250 hover:bg-emerald-50 hover:text-emerald-700",
+              collapsed && "justify-center px-3"
             )}
           >
+            <Settings className="h-4 w-4 transition-transform duration-250 group-hover:rotate-90" />
+            
             {!collapsed && (
-              <span className="transition-all duration-300 text-foreground group-hover:text-foreground">
+              <span className="transition-colors duration-250">
                 Созламалар
               </span>
             )}
-            
-            <Settings className={cn(
-              "h-5 w-5 transition-all duration-300 text-foreground",
-              "group-hover:rotate-90 group-hover:scale-110 group-hover:text-foreground"
-            )} />
-            
-            {/* Hover background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 to-gray-700/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
           </div>
         </Link>
       </div>

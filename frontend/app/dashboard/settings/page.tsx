@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -92,6 +93,22 @@ export default function SettingsPage() {
   const currentUser = { firstName: "Admin", lastName: "User", middleName: "", phone: "", pnfl: "12345678901234", role: "ADMIN" }
   const isAdmin = currentUser.role === "ADMIN"
 
+  // Mock data for applications (Murojatlar)
+  const [applications] = useState([
+    { id: 1, fullName: "Abdulla Karimov", subject: "Ish o'rnini o'zgartirish", status: "Ko'rilmoqda", date: "2024-01-15", priority: "Yuqori" },
+    { id: 2, fullName: "Zarina Toshmatova", subject: "Ta'til berish", status: "Qabul qilindi", date: "2024-01-14", priority: "O'rta" },
+    { id: 3, fullName: "Bekzod Rahimov", subject: "Maosh to'g'risida", status: "Jarayonda", date: "2024-01-13", priority: "Past" },
+    { id: 4, fullName: "Dilnoza Azimova", subject: "Ishga qabul qilish", status: "Yangi", date: "2024-01-12", priority: "Yuqori" },
+  ])
+
+  // Mock data for tasks (Topshiriqlar)
+  const [tasks] = useState([
+    { id: 1, title: "Hisobot tayyorlash", assignee: "Abdulla Karimov", deadline: "2024-01-20", status: "Jarayonda", priority: "Yuqori" },
+    { id: 2, title: "Rejalashtirish", assignee: "Zarina Toshmatova", deadline: "2024-01-18", status: "Bajarildi", date: "2024-01-16", priority: "O'rta" },
+    { id: 3, title: "Hujjatlar tekshiruvi", assignee: "Bekzod Rahimov", deadline: "2024-01-22", status: "Boshlanmadi", date: "2024-01-17", priority: "Past" },
+    { id: 4, title: "Uchrashuv tashkil etish", assignee: "Dilnoza Azimova", deadline: "2024-01-19", status: "Jarayonda", date: "2024-01-15", priority: "Yuqori" },
+  ])
+
   const saveBotSettings = () => {
     // Persist bot settings
     postSettings({ telegramBotToken: botToken, telegramBotUsername: botUsername }).catch(() => {})
@@ -163,10 +180,26 @@ export default function SettingsPage() {
                 {t.settings.appearance}
               </TabsTrigger>
               
+              <TabsTrigger 
+                value="applications" 
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Murojatlar
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="tasks" 
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Topshiriqlar
+              </TabsTrigger>
+              
               {isAdmin && (
                 <TabsTrigger 
                   value="admin" 
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-emerald-600 data-[state=active]:border-emerald-600 transition-colors"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   {t.settings.admin}
@@ -188,7 +221,7 @@ export default function SettingsPage() {
               <CardContent className="space-y-6">
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarFallback className="bg-blue-600 text-white text-lg font-medium">
+                    <AvatarFallback className="bg-emerald-600 text-white text-lg font-medium">
                       AK
                     </AvatarFallback>
                   </Avatar>
@@ -199,11 +232,11 @@ export default function SettingsPage() {
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white animate-bounce-subtle" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  <h3 className="text-2xl font-bold text-emerald-600 bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
                     {currentUser.firstName} {currentUser.lastName}
                   </h3>
                   <p className="text-lg text-muted-foreground">{currentUser.role}</p>
-                  <Badge variant="outline" className="mt-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-primary border-primary/30 px-4 py-2">
+                  <Badge variant="outline" className="mt-3 bg-emerald-50 text-emerald-600 border-emerald-200 px-4 py-2">
                     <UserCheck className="mr-2 h-4 w-4" />
                     {t.settings.oneIDConnected}
                   </Badge>
@@ -253,7 +286,7 @@ export default function SettingsPage() {
                 <div className="flex justify-end pt-6">
                   <Button 
                     onClick={saveSettings}
-                    className="h-12 px-8 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    className="h-12 px-8 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-250 hover:scale-105"
                   >
                     <Save className="mr-2 h-5 w-5" />
                     {t.common.save}
@@ -265,11 +298,11 @@ export default function SettingsPage() {
 
           {/* Notification Settings */}
           <TabsContent value="notifications" className="animate-fade-in">
-            <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl hover:shadow-3xl transition-all duration-500">
+            <Card className="bg-white border border-gray-200 shadow-sm hover:border-emerald-300 transition-all duration-250">
               <CardHeader className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-pink-500/10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-emerald-600/3 to-emerald-700/5" />
                 <CardTitle className="relative flex items-center gap-3 text-2xl">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
                     <Bell className="h-4 w-4 text-white" />
                   </div>
                   {t.settings.notificationSettings}
@@ -278,13 +311,13 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-8 p-8">
                 <div className="space-y-6">
-                  <h4 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                  <h4 className="text-xl font-semibold text-emerald-600 bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
                     {t.settings.notificationChannels}
                   </h4>
 
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-blue-500/5 to-purple-600/5 hover:from-blue-500/10 hover:to-purple-600/10 transition-all duration-300">
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-gray-200 p-6 bg-emerald-50 hover:bg-emerald-100 transition-all duration-250">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 shadow-sm">
                         <Mail className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -299,9 +332,9 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-purple-500/5 to-pink-600/5 hover:from-purple-500/10 hover:to-pink-600/10 transition-all duration-300">
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-gray-200 p-6 bg-emerald-50 hover:bg-emerald-100 transition-all duration-250">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 shadow-sm">
                         <MessageSquare className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -316,9 +349,9 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-pink-500/5 to-orange-600/5 hover:from-pink-500/10 hover:to-orange-600/10 transition-all duration-300">
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-gray-200 p-6 bg-amber-50 hover:bg-amber-100 transition-all duration-250">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-orange-600 shadow-lg">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-600 shadow-sm">
                         <Smartphone className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -337,12 +370,12 @@ export default function SettingsPage() {
                 <Separator className="my-8" />
 
                 <div className="space-y-6">
-                  <h4 className="text-xl font-semibold bg-gradient-to-r from-green-500 to-teal-600 bg-clip-text text-transparent">
+                  <h4 className="font-medium text-emerald-600">
                     {t.settings.notificationTypes}
                   </h4>
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-green-500/5 to-teal-600/5 hover:from-green-500/10 hover:to-teal-600/10 transition-all duration-300">
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-gray-200 p-6 bg-emerald-50 hover:bg-emerald-100 transition-all duration-250">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-teal-600 shadow-lg">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 shadow-sm">
                         <AlertCircle className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -357,9 +390,9 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                <div className="flex items-center justify-between rounded-2xl border-2 border-border/50 p-6 bg-gradient-to-r from-teal-500/5 to-cyan-600/5 hover:from-teal-500/10 hover:to-cyan-600/10 transition-all duration-300">
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-gray-200 p-6 bg-emerald-50 hover:bg-emerald-100 transition-all duration-250">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 shadow-lg">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 shadow-sm">
                         <AlertCircle className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -378,7 +411,7 @@ export default function SettingsPage() {
                 <div className="flex justify-end pt-6">
                   <Button 
                     onClick={saveSettings}
-                    className="h-12 px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-500/90 hover:to-purple-600/90 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    className="h-12 px-8 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-250 hover:scale-105"
                   >
                     <Save className="mr-2 h-5 w-5" />
                     {t.common.save}
@@ -459,7 +492,7 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label>{t.settings.language}</Label>
                   <Select value={language} onValueChange={(v) => setLanguage(v)}>
-                    <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px] bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
                       <Globe className="mr-2 h-4 w-4" />
                       <SelectValue />
                     </SelectTrigger>
@@ -472,11 +505,107 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button onClick={saveSettings}>
+                  <Button onClick={saveSettings} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                     <Save className="mr-2 h-4 w-4" />
                     {t.common.save}
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Applications (Murojatlar) */}
+          <TabsContent value="applications">
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">
+                  Murojatlar
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Barcha kelgan murojatlar ro'yxati
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>F.I.O</TableHead>
+                      <TableHead>Mavzu</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Sana</TableHead>
+                      <TableHead>Muhimlik</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {applications.map((app) => (
+                      <TableRow key={app.id}>
+                        <TableCell>{app.id}</TableCell>
+                        <TableCell>{app.fullName}</TableCell>
+                        <TableCell>{app.subject}</TableCell>
+                        <TableCell>
+                          <Badge variant={app.status === "Yangi" ? "default" : app.status === "Qabul qilindi" ? "secondary" : "outline"}>
+                            {app.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{app.date}</TableCell>
+                        <TableCell>
+                          <Badge variant={app.priority === "Yuqori" ? "destructive" : app.priority === "O'rta" ? "default" : "secondary"}>
+                            {app.priority}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Tasks (Topshiriqlar) */}
+          <TabsContent value="tasks">
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">
+                  Topshiriqlar
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Barcha topshiriqlar ro'yxati
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Sarlavha</TableHead>
+                      <TableHead>Mas'ul</TableHead>
+                      <TableHead>Muddat</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Muhimlik</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tasks.map((task) => (
+                      <TableRow key={task.id}>
+                        <TableCell>{task.id}</TableCell>
+                        <TableCell>{task.title}</TableCell>
+                        <TableCell>{task.assignee}</TableCell>
+                        <TableCell>{task.deadline}</TableCell>
+                        <TableCell>
+                          <Badge variant={task.status === "Bajarildi" ? "default" : task.status === "Jarayonda" ? "secondary" : "outline"}>
+                            {task.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={task.priority === "Yuqori" ? "destructive" : task.priority === "O'rta" ? "default" : "secondary"}>
+                            {task.priority}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
@@ -494,17 +623,17 @@ export default function SettingsPage() {
                     <CardDescription>{t.settings.telegramBotDesc}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <Alert className="border-primary/30 bg-primary/5">
-                      <AlertCircle className="h-4 w-4 text-primary" />
+                    <Alert className="border-emerald-200 bg-emerald-50">
+                      <AlertCircle className="h-4 w-4 text-emerald-600" />
                       <AlertDescription className="text-sm">
                         {t.settings.createBot}
                       </AlertDescription>
                     </Alert>
 
                     {tokenSaved && (
-                      <Alert className="border-accent/30 bg-accent/5">
-                        <CheckCircle2 className="h-4 w-4 text-accent" />
-                        <AlertDescription className="text-sm text-accent">
+                      <Alert className="border-emerald-200 bg-emerald-50">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                        <AlertDescription className="text-sm text-emerald-600">
                           {t.settings.settingsSaved}!
                         </AlertDescription>
                       </Alert>
