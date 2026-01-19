@@ -201,110 +201,114 @@ export default function TasksPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full animate-float" />
-          <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/10 rounded-full animate-float" style={{ animationDelay: "1s" }} />
-        </div>
+      <div className="min-h-screen bg-gray-50">
         
         <div className="relative z-10 p-6 space-y-8">
           {/* Filters Section */}
           <section className="animate-slide-up">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center animate-pulse-modern shadow-lg">
+              <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-lg">📋</span>
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gradient-animated">Топшириқлар</h2>
-                <p className="text-sm text-muted-foreground">Барча топшириқлар рўйхати ва бошқаруви</p>
+                <h2 className="text-2xl font-bold text-gray-900">Топшириқлар</h2>
+                <p className="text-sm text-gray-500">Барча топшириқлар рўйхати ва бошқаруви</p>
               </div>
             </div>
             
             <Card className="card-modern">
-              <CardContent className="p-6">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-center flex-wrap">
-                    <div className="relative flex-1 md:max-w-sm">
-                      <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <CardContent className="p-4">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  {/* Search and main filters */}
+                  <div className="flex flex-1 flex-col gap-3 lg:flex-row lg:items-center">
+                    <div className="relative flex-1 lg:max-w-md">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                       <Input
                         placeholder="Топшириқ қидириш..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input-modern pl-12"
+                        className="pl-10 h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250"
                       />
                     </div>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-full md:w-[160px] input-modern">
-                        <Filter className="mr-2 h-4 w-4" />
-                        <SelectValue placeholder="Ҳолат" />
-                      </SelectTrigger>
-                      <SelectContent className="glass">
-                        <SelectItem value="all">Барча ҳолатлар</SelectItem>
-                        {(Object.keys(taskStatusLabels) as TaskStatus[]).map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {taskStatusLabels[status]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                      <SelectTrigger className="w-full md:w-[160px] input-modern">
-                        <SelectValue placeholder="Устуворлик" />
-                      </SelectTrigger>
-                      <SelectContent className="glass">
-                        <SelectItem value="all">Барча устуворликлар</SelectItem>
-                        {(Object.keys(priorityLabels) as TaskPriority[]).map((priority) => (
-                          <SelectItem key={priority} value={priority}>
-                            {priorityLabels[priority]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={sectorFilter} onValueChange={setSectorFilter}>
-                      <SelectTrigger className="w-full md:w-[180px] input-modern">
-                        <Layers className="mr-2 h-4 w-4" />
-                        <SelectValue placeholder="Сўҳа" />
-                      </SelectTrigger>
-                      <SelectContent className="glass">
-                        <SelectItem value="all">Барча сўҳалар</SelectItem>
-                        {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
-                          <SelectItem key={sector} value={sector}>
-                            {sectorLabels[sector]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={deadlineFilter} onValueChange={setDeadlineFilter}>
-                      <SelectTrigger className="w-full md:w-[160px] input-modern">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        <SelectValue placeholder="Муддат" />
-                      </SelectTrigger>
-                      <SelectContent className="glass">
-                        <SelectItem value="all">Барча муддатлар</SelectItem>
-                        <SelectItem value="overdue">Кечикган</SelectItem>
-                        <SelectItem value="today">Бугун</SelectItem>
-                        <SelectItem value="3days">3 кунгача</SelectItem>
-                        <SelectItem value="week">Ҳафтагача</SelectItem>
-                        <SelectItem value="month">Ойгача</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[140px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
+                          <Filter className="mr-2 h-3 w-3 text-gray-400" />
+                          <SelectValue placeholder="Ҳолат" />
+                        </SelectTrigger>
+                        <SelectContent className="glass">
+                          <SelectItem value="all">Барча ҳолатлар</SelectItem>
+                          {(Object.keys(taskStatusLabels) as TaskStatus[]).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {taskStatusLabels[status]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                        <SelectTrigger className="w-[130px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
+                          <SelectValue placeholder="Устуворлик" />
+                        </SelectTrigger>
+                        <SelectContent className="glass">
+                          <SelectItem value="all">Барча устуворликлар</SelectItem>
+                          {(Object.keys(priorityLabels) as TaskPriority[]).map((priority) => (
+                            <SelectItem key={priority} value={priority}>
+                              {priorityLabels[priority]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select value={deadlineFilter} onValueChange={setDeadlineFilter}>
+                        <SelectTrigger className="w-[140px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
+                          <Calendar className="mr-2 h-3 w-3 text-gray-400" />
+                          <SelectValue placeholder="Муддат" />
+                        </SelectTrigger>
+                        <SelectContent className="glass">
+                          <SelectItem value="all">Барча муддатлар</SelectItem>
+                          <SelectItem value="overdue">Кечикган</SelectItem>
+                          <SelectItem value="today">Бугун</SelectItem>
+                          <SelectItem value="3days">3 кунгача</SelectItem>
+                          <SelectItem value="week">Ҳафтагача</SelectItem>
+                          <SelectItem value="month">Ойгача</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select value={sectorFilter} onValueChange={setSectorFilter}>
+                        <SelectTrigger className="w-[150px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
+                          <Layers className="mr-2 h-3 w-3 text-gray-400" />
+                          <SelectValue placeholder="Сўҳа" />
+                        </SelectTrigger>
+                        <SelectContent className="glass">
+                          <SelectItem value="all">Барча сўҳалар</SelectItem>
+                          {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
+                            <SelectItem key={sector} value={sector}>
+                              {sectorLabels[sector]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
+                  
+                  {/* Create button */}
                   <Dialog open={isCreateOpen} onOpenChange={(open) => {
-    setIsCreateOpen(open)
-    if (!open) {
-      resetForm()
-    }
-  }}>
+                    setIsCreateOpen(open)
+                    if (!open) {
+                      resetForm()
+                    }
+                  }}>
                     <DialogTrigger asChild>
-                      <Button className="btn-modern">
+                      <Button className="bg-emerald-600 hover:bg-emerald-700 text-white h-10 px-4 transition-all duration-250">
                         <Plus className="mr-2 h-4 w-4" />
                         Янги топшириқ
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] max-h-[75vh] overflow-y-auto glass my-4">
+                    <DialogContent className="sm:max-w-[600px] max-h-[75vh] overflow-y-auto bg-white border border-gray-200 shadow-lg my-4">
                       <DialogHeader>
-                        <DialogTitle className="text-gradient-animated">Янги топшириқ яратиш</DialogTitle>
+                        <DialogTitle className="text-gray-900">Янги топшириқ яратиш</DialogTitle>
                         <DialogDescription>
                           Топшириқ маълумотларини киритинг ва ташкилотларни танланг
                         </DialogDescription>
@@ -315,7 +319,7 @@ export default function TasksPage() {
                           <Input
                             id="taskTitle"
                             placeholder="Топшириқ сарлавҳасини киритинг..."
-                            className="input-modern"
+                            className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250"
                           />
                         </div>
                         
@@ -324,7 +328,7 @@ export default function TasksPage() {
                           <Textarea
                             id="taskDescription"
                             placeholder="Топшириқ ҳақида тўлиқ маълумот..."
-                            className="input-modern min-h-[100px]"
+                            className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250 min-h-[100px]"
                           />
                         </div>
                         
@@ -332,10 +336,10 @@ export default function TasksPage() {
                           <div className="space-y-2">
                             <Label htmlFor="taskPriority">Устуворлик *</Label>
                             <Select value={selectedPriority} onValueChange={handlePriorityChange}>
-                              <SelectTrigger className="input-modern text-xs h-10">
+                              <SelectTrigger className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250 text-xs h-10">
                                 <SelectValue placeholder="Устуворликни танланг" />
                               </SelectTrigger>
-                              <SelectContent className="glass" position="popper" sideOffset={10} avoidCollisions={true}>
+                              <SelectContent className="bg-white border border-gray-200 shadow-lg" position="popper" sideOffset={10} avoidCollisions={true}>
                                 {(Object.keys(priorityLabels) as TaskPriority[]).map((priority) => (
                                   <SelectItem key={priority} value={priority}>
                                     {priorityLabels[priority]}
@@ -352,7 +356,7 @@ export default function TasksPage() {
                               type="date"
                               value={taskDeadline}
                               onChange={(e) => handleDeadlineChange(e.target.value)}
-                              className="input-modern z-10"
+                              className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250 z-10"
                             />
                           </div>
                         </div>
@@ -360,7 +364,7 @@ export default function TasksPage() {
                         <div className="space-y-2">
                           <Label htmlFor="taskSector">Сохалар *</Label>
                           <Select value={selectedSector} onValueChange={setSelectedSector}>
-                            <SelectTrigger className="input-modern">
+                            <SelectTrigger className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
                               <SelectValue placeholder="Сохаларни танланг" />
                             </SelectTrigger>
                             <SelectContent className="glass" position="popper" sideOffset={10} avoidCollisions={true}>
@@ -375,7 +379,7 @@ export default function TasksPage() {
                         
                         <div className="space-y-2">
                           <Label>Ташкилотлар *</Label>
-                          <div className="space-y-3 max-h-[200px] overflow-y-auto p-2 border border-border/50 rounded-lg bg-muted/30">
+                          <div className="space-y-3 max-h-[200px] overflow-y-auto p-3 border border-gray-200 rounded-lg bg-gray-50">
                             {Object.values(orgsMap).map((org) => (
                               <div key={org.id} className="flex items-center space-x-2">
                                 <Checkbox
@@ -401,12 +405,13 @@ export default function TasksPage() {
                             resetForm()
                             setIsCreateOpen(false)
                           }}
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-250"
                         >
                           Бекор қилиш
                         </Button>
                         <Button 
                           onClick={handleCreateTask}
-                          className="btn-modern"
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-250"
                         >
                           <Plus className="mr-2 h-4 w-4" />
                           Топшириқ яратиш
@@ -425,27 +430,27 @@ export default function TasksPage() {
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-white/10 hover:bg-transparent">
-                      <TableHead className="text-muted-foreground">Сарлавҳа</TableHead>
-                      <TableHead className="text-muted-foreground">Сўҳа</TableHead>
-                      <TableHead className="text-muted-foreground">Устуворлик</TableHead>
-                      <TableHead className="text-muted-foreground">Ҳолат</TableHead>
-                      <TableHead className="text-muted-foreground">Ташкилот</TableHead>
-                      <TableHead className="text-muted-foreground">Муддат</TableHead>
-                      <TableHead className="text-muted-foreground w-[50px]"></TableHead>
+                    <TableRow className="border-gray-200 hover:bg-gray-50 transition-colors duration-250">
+                      <TableHead className="text-gray-700 font-semibold">Сарлавҳа</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Сўҳа</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Устуворлик</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Ҳолат</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Ташкилот</TableHead>
+                      <TableHead className="text-gray-700 font-semibold">Муддат</TableHead>
+                      <TableHead className="text-gray-700 font-semibold w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredTasks.map((task) => (
-                      <TableRow key={task.id} className="border-white/10 hover:bg-white/5 transition-colors duration-200">
+                      <TableRow key={task.id} className="border-gray-200 hover:bg-emerald-50 transition-colors duration-250">
                         <TableCell>
-                          <Link href={`/dashboard/tasks/${task.id}`} className="block hover:text-primary transition-colors">
-                            <p className="font-medium text-foreground">{task.title}</p>
-                            <p className="text-sm text-muted-foreground line-clamp-1">{task.description}</p>
+                          <Link href={`/dashboard/tasks/${task.id}`} className="block hover:text-emerald-600 transition-colors duration-250">
+                            <p className="font-medium text-gray-900">{task.title}</p>
+                            <p className="text-sm text-gray-500 line-clamp-1">{task.description}</p>
                           </Link>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="font-normal border-white/20">
+                          <Badge variant="outline" className="font-normal border-gray-300 text-gray-700 bg-gray-50">
                             {sectorLabels[task.sector]}
                           </Badge>
                         </TableCell>
@@ -456,36 +461,36 @@ export default function TasksPage() {
                           <TaskStatusBadge status={task.status} />
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Building2 className="h-4 w-4" />
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Building2 className="h-4 w-4 text-gray-400" />
                             <span className="truncate max-w-[150px]">{(task.organizations || []).map((id: string) => orgsMap[id]?.name).filter(Boolean).join(", ")}</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="h-4 w-4" />
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Calendar className="h-4 w-4 text-gray-400" />
                             {new Date(task.deadline).toLocaleDateString("uz-UZ")}
                           </div>
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/10">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass">
+                            <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
                               <Link href={`/dashboard/tasks/${task.id}`}>
-                                <DropdownMenuItem className="hover:bg-white/10">
+                                <DropdownMenuItem className="hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
                                   <Eye className="mr-2 h-4 w-4" />
                                   Кўриш
                                 </DropdownMenuItem>
                               </Link>
-                              <DropdownMenuItem className="hover:bg-white/10">
+                              <DropdownMenuItem className="hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
                                 <Edit className="mr-2 h-4 w-4" />
                                 Таҳрирлаш
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
+                              <DropdownMenuItem className="text-red-600 hover:bg-red-50 transition-all duration-250">
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Ўчириш
                               </DropdownMenuItem>

@@ -27,53 +27,51 @@ export function OrganizationRatings() {
 
   const getRankColor = (index: number) => {
     switch (index) {
-      case 0: return "from-yellow-400 to-yellow-600"
+      case 0: return "from-emerald-400 to-emerald-600"
       case 1: return "from-gray-400 to-gray-600"
-      case 2: return "from-orange-400 to-orange-600"
-      default: return "from-muted to-muted-foreground"
+      case 2: return "from-amber-400 to-amber-600"
+      default: return "from-gray-400 to-gray-600"
     }
   }
 
   const getRankBg = (index: number) => {
     switch (index) {
-      case 0: return "from-yellow-400/20 to-yellow-600/20"
+      case 0: return "from-emerald-400/20 to-emerald-600/20"
       case 1: return "from-gray-400/20 to-gray-600/20"
-      case 2: return "from-orange-400/20 to-orange-600/20"
-      default: return "from-muted/50 to-muted-foreground/50"
+      case 2: return "from-amber-400/20 to-amber-600/20"
+      default: return "from-gray-100/50 to-gray-600/50"
     }
   }
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 90) return "text-green-500"
-    if (rating >= 70) return "text-yellow-500"
-    return "text-red-500"
+    if (rating >= 90) return "text-emerald-600"
+    if (rating >= 70) return "text-amber-600"
+    return "text-red-600"
   }
 
   const getRatingGradient = (rating: number) => {
-    if (rating >= 90) return "from-green-500 to-green-600"
-    if (rating >= 70) return "from-yellow-500 to-yellow-600"
+    if (rating >= 90) return "from-emerald-500 to-emerald-600"
+    if (rating >= 70) return "from-amber-500 to-amber-600"
     return "from-red-500 to-red-600"
   }
 
   return (
-    <Card className="card-modern group relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <Card className="bg-white border border-gray-200 rounded-xl shadow-sm group relative overflow-hidden hover:border-emerald-300 transition-all duration-250">
       
-      <CardHeader className="relative z-10 border-b border-border/50 bg-gradient-to-r from-amber-500/10 to-orange-600/10">
+      <CardHeader className="relative z-10 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center animate-pulse-modern">
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
               <Trophy className="w-4 h-4 text-white" />
             </div>
-            <CardTitle className="text-lg font-semibold text-gradient-animated">Ташкилотлар рейтиги</CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900">Ташкилотлар рейтиги</CardTitle>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30">
               <TrendingUp className="w-3 h-3 text-green-500" />
-              <span className="text-xs font-medium text-green-500">+8%</span>
+              <span className="text-xs font-medium text-emerald-700">+8%</span>
             </div>
-            <div className="w-2 h-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full animate-pulse-modern" />
+            <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse" />
           </div>
         </div>
       </CardHeader>
@@ -83,13 +81,11 @@ export function OrganizationRatings() {
           <div
             key={org.id}
             className={cn(
-              "group/org relative space-y-3 rounded-xl border border-border/50 bg-gradient-to-r from-card to-card/50 p-4 transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-glow animate-slide-up",
-              "hover:from-amber-500/5 hover:to-orange-600/5"
+              "group/org relative space-y-3 rounded-xl border border-gray-200 bg-white p-4 transition-all duration-250 hover:scale-105 hover:shadow-md hover:border-emerald-300 animate-slide-up",
+              "hover:bg-emerald-50"
             )}
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            {/* Hover background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-600/5 opacity-0 group-hover/org:opacity-100 transition-opacity duration-300 rounded-xl" />
             
             {/* Rank and Name */}
             <div className="relative z-10 flex items-center justify-between">
@@ -106,18 +102,18 @@ export function OrganizationRatings() {
                   </span>
                   {/* Decorative ring */}
                   <div className={cn(
-                    "absolute -inset-1 rounded-full bg-gradient-to-br opacity-20 animate-pulse-modern",
-                    getRankColor(index)
+                    "absolute -inset-1 rounded-full bg-gradient-to-br opacity-20 animate-pulse",
+                    getRatingGradient(org.rating)
                   )} />
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-muted-foreground group-hover/org:text-primary transition-colors duration-200" />
+                  <Building2 className="w-4 h-4 text-gray-500 group-hover/org:text-emerald-600 transition-colors duration-250" />
                   <div>
-                    <h3 className="font-semibold text-foreground group-hover/org:text-primary transition-colors duration-200">
+                    <h3 className="font-semibold text-gray-900 group-hover/org:text-emerald-600 transition-colors duration-250">
                       {org.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground group-hover/org:text-foreground/80 transition-colors duration-200">
+                    <p className="text-xs text-gray-500 group-hover/org:text-gray-600 transition-colors duration-250">
                       {org.sector} • {org.region}
                     </p>
                   </div>
@@ -127,15 +123,15 @@ export function OrganizationRatings() {
               {/* Rating */}
               <div className="relative">
                 <div className={cn(
-                  "flex items-center gap-2 px-3 py-1 rounded-lg transition-all duration-300 group-hover/org:scale-105",
-                  "bg-gradient-to-r " + getRatingGradient(org.rating) + "/20"
+                  "flex items-center gap-2 px-3 py-1 rounded-lg transition-all duration-250",
+                  "bg-emerald-100 text-emerald-700"
                 )}>
                   <Star className={cn(
-                    "w-4 h-4 transition-all duration-200",
+                    "w-4 h-4 transition-all duration-250",
                     getRatingColor(org.rating)
                   )} />
                   <span className={cn(
-                    "text-sm font-bold transition-all duration-200",
+                    "text-sm font-bold transition-all duration-250",
                     getRatingColor(org.rating)
                   )}>
                     {org.rating}%
@@ -158,28 +154,24 @@ export function OrganizationRatings() {
               <div className="relative">
                 <Progress 
                   value={org.rating} 
-                  className="h-3 transition-all duration-1000 ease-out"
+                  className={cn(
+                    "h-3 transition-all duration-1000 ease-out",
+                    org.rating >= 90 ? "bg-emerald-600" : 
+                    org.rating >= 70 ? "bg-amber-600" : "bg-red-600"
+                  )}
                 />
-                {/* Progress glow effect */}
-                <div className={cn(
-                  "absolute inset-0 rounded-full bg-gradient-to-r opacity-0 transition-opacity duration-300",
-                  getRatingGradient(org.rating) + "/20"
-                )} />
               </div>
             </div>
             
-            {/* Decorative elements */}
-            <div className="absolute top-2 right-2 w-1 h-1 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full opacity-30 animate-pulse-modern" />
-            <div className="absolute bottom-2 left-2 w-2 h-1 bg-gradient-to-br from-orange-600 to-amber-500 rounded-full opacity-30 animate-pulse-modern" />
           </div>
         ))}
         
         {sortedOrgs.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center mb-4 animate-float">
-              <Building2 className="w-8 h-8 text-muted-foreground" />
+            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+              <Building2 className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Ташкилотлар топилмади</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Ташкилотлар топилмади</h3>
             <p className="text-sm text-muted-foreground max-w-md">
               Ҳозирча ҳеч қандай ташкилотлар мавжуд эмас. Ташкилотларни қўшиш учун ташкилотлар бўлимига ўтинг.
             </p>

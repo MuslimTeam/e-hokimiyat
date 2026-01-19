@@ -34,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uz" className="light" suppressHydrationWarning>
-      <body className={`font-sans antialiased bg-background text-foreground`}>
+      <body className={`font-sans antialiased bg-gray-50 text-gray-900`}>
         <I18nProvider>
           {children}
           <Analytics />
