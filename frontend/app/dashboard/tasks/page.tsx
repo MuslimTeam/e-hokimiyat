@@ -24,9 +24,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function TasksPage() {
+  const router = useRouter()
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
   const [sectorFilter, setSectorFilter] = useState<string>("all")

@@ -9,6 +9,12 @@ import { getNotifications } from "@/lib/api"
 import { Header } from "@/components/layout/header"
 
 const notificationTypes = {
+  task_new: { icon: Info, color: "bg-blue-500", label: "Янги топшириқ" },
+  task_completed: { icon: CheckCircle, color: "bg-green-500", label: "Топшириқ бажарилди" },
+  task_updated: { icon: AlertTriangle, color: "bg-amber-500", label: "Топшириқ ўзгартирилди" },
+  user_created: { icon: CheckCircle, color: "bg-green-500", label: "Фойдаланувчи яратилди" },
+  user_updated: { icon: AlertTriangle, color: "bg-amber-500", label: "Фойдаланувчи ўзгартирилди" },
+  system: { icon: Info, color: "bg-blue-500", label: "Тизим" },
   info: { icon: Info, color: "bg-blue-500", label: "Маълумот" },
   warning: { icon: AlertTriangle, color: "bg-amber-500", label: "Огоҳлантириш" },
   success: { icon: CheckCircle, color: "bg-green-500", label: "Муваффақият" },
@@ -19,12 +25,22 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([])
   const [filter, setFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getNotifications()
-      .then(setNotifications)
-      .catch(console.error)
+    loadNotifications()
   }, [])
+
+  const loadNotifications = async () => {
+    try {
+      const data = await getNotifications()
+      setNotifications(data.notifications || [])
+    } catch (error) {
+      console.error('Failed to load notifications:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const markAsRead = (id: string) => {
     setNotifications(notifications.map(n => 
@@ -94,46 +110,43 @@ export default function NotificationsPage() {
               
               {/* Controls */}
               <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-md p-6">
-                <div className="flex flex-wrap gap-4 items-center justify-between">
-                  <div className="flex flex-wrap gap-4 items-center">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                      <input
-                        type="text"
-                        placeholder="Билдиришномаларни қидириш..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 pr-4 py-2 bg-background/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      {Object.entries(notificationTypes).map(([type, config]) => (
-                        <button
-                          key={type}
-                          onClick={() => setFilter(type)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                            filter === type
-                              ? `${config.color} text-white`
-                              : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                          }`}
-                        >
-                          {config.label}
-                        </button>
-                      ))}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="relative flex-1 sm:max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <input
+                      type="text"
+                      placeholder="Билдиришномаларни қидириш..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 bg-background/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1 items-center">
+                    {Object.entries(notificationTypes).map(([type, config]) => (
                       <button
-                        onClick={() => setFilter("all")}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          filter === "all"
-                            ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white"
+                        key={type}
+                        onClick={() => setFilter(type)}
+                        className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                          filter === type
+                            ? `${config.color} text-white`
                             : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {config.label}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setFilter("all")}
+                      className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                        filter === "all"
+                          ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
                         }`}
                       >
                         Барчаси
                       </button>
-                    </div>
                   </div>
-                  
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
@@ -185,7 +198,7 @@ export default function NotificationsPage() {
                   ) : (
                     <div className="space-y-4">
                       {filteredNotifications.map((notification) => {
-                        const typeConfig = notificationTypes[notification.type as keyof typeof notificationTypes]
+                        const typeConfig = notificationTypes[notification.type as keyof typeof notificationTypes] || notificationTypes.info
                         const Icon = typeConfig.icon
                         
                         return (
