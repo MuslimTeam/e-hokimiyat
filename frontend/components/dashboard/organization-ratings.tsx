@@ -1,8 +1,9 @@
+// @ts-nocheck
 "use client"
 
 import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getOrganizations } from "@/lib/api"
+import { getAnalyticsOrganizations } from "@/lib/api"
 import { Progress } from "@/components/ui/progress"
 import { Trophy, Star, TrendingUp, Building2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -12,7 +13,7 @@ export function OrganizationRatings() {
 
   React.useEffect(() => {
     let mounted = true
-    getOrganizations()
+    getAnalyticsOrganizations()
       .then((list) => {
         if (!mounted) return
         setOrgs(list)
@@ -23,7 +24,8 @@ export function OrganizationRatings() {
     }
   }, [])
 
-  const sortedOrgs = [...orgs].filter((org) => org.isActive).sort((a, b) => b.rating - a.rating)
+  // API already returns rating/completion data, sort by completionRate/performance
+  const sortedOrgs = [...orgs].sort((a, b) => (b.performance ?? 0) - (a.performance ?? 0))
 
   const getRankColor = (index: number) => {
     switch (index) {
@@ -56,23 +58,23 @@ export function OrganizationRatings() {
   }
 
   return (
-    <Card className="bg-white border border-gray-200 rounded-xl shadow-sm group relative overflow-hidden hover:border-emerald-300 transition-all duration-250">
-      
-      <CardHeader className="relative z-10 border-b border-gray-200 bg-gray-50">
+    <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md hover:shadow-xl transition-all duration-300 group relative overflow-hidden rounded-2xl">
+
+      <CardHeader className="relative z-10 border-b border-border bg-card/60 backdrop-blur-sm rounded-t-2xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
-              <Trophy className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+              <Trophy className="w-4 h-4 text-primary-foreground" />
             </div>
-            <CardTitle className="text-lg font-semibold text-gray-900">Ташкилотлар рейтиги</CardTitle>
+            <CardTitle className="text-lg font-semibold text-foreground">Ташкилотлар рейтиги</CardTitle>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30">
-              <TrendingUp className="w-3 h-3 text-green-500" />
-              <span className="text-xs font-medium text-emerald-700">+8%</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 border border-emerald-500/30">
+                <TrendingUp className="w-3 h-3 text-emerald-600" />
+                <span className="text-xs font-medium text-emerald-700">Самарадорлик</span>
+              </div>
+              <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse" />
             </div>
-            <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse" />
-          </div>
         </div>
       </CardHeader>
       
@@ -81,8 +83,8 @@ export function OrganizationRatings() {
           <div
             key={org.id}
             className={cn(
-              "group/org relative space-y-3 rounded-xl border border-gray-200 bg-white p-4 transition-all duration-250 hover:scale-105 hover:shadow-md hover:border-emerald-300 animate-slide-up",
-              "hover:bg-emerald-50"
+              "group/org relative space-y-3 rounded-xl border border-gray-200/50 bg-white/60 backdrop-blur-sm p-4 transition-all duration-300 hover:scale-102 hover:shadow-lg hover:border-emerald-300/50 hover:bg-white/80 animate-slide-up",
+              "hover:bg-emerald-50/50"
             )}
             style={{ animationDelay: `${index * 100}ms` }}
           >
@@ -110,37 +112,37 @@ export function OrganizationRatings() {
                 <div className="flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-gray-500 group-hover/org:text-emerald-600 transition-colors duration-250" />
                   <div>
-                    <h3 className="font-semibold text-gray-900 group-hover/org:text-emerald-600 transition-colors duration-250">
+                    <h3 className="font-semibold text-foreground group-hover/org:text-emerald-600 transition-colors duration-250">
                       {org.name}
                     </h3>
-                    <p className="text-xs text-gray-500 group-hover/org:text-gray-600 transition-colors duration-250">
-                      {org.sector} • {org.region}
+                    <p className="text-xs text-muted-foreground group-hover/org:text-gray-600 transition-colors duration-250">
+                      Жами: {org.totalTasks} та, бажарилган: {org.completedTasks} та
                     </p>
                   </div>
                 </div>
               </div>
               
-              {/* Rating */}
+              {/* Rating (completion rate) */}
               <div className="relative">
                 <div className={cn(
                   "flex items-center gap-2 px-3 py-1 rounded-lg transition-all duration-250",
-                  "bg-emerald-100 text-emerald-700"
+                  "bg-emerald-50 text-emerald-700"
                 )}>
                   <Star className={cn(
                     "w-4 h-4 transition-all duration-250",
-                    getRatingColor(org.rating)
+                    getRatingColor(org.completionRate)
                   )} />
                   <span className={cn(
                     "text-sm font-bold transition-all duration-250",
-                    getRatingColor(org.rating)
+                    getRatingColor(org.completionRate)
                   )}>
-                    {org.rating}%
+                    {org.completionRate}%
                   </span>
                 </div>
                 {/* Decorative glow */}
                 <div className={cn(
                   "absolute -inset-1 rounded-lg bg-gradient-to-r opacity-0 transition-opacity duration-300",
-                  getRatingGradient(org.rating) + "/10"
+                  getRatingGradient(org.completionRate) + "/10"
                 )} />
               </div>
             </div>
@@ -149,17 +151,10 @@ export function OrganizationRatings() {
             <div className="relative z-10 space-y-2">
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Тўлиқлик</span>
-                <span className="font-medium">{org.completedTasks}/{org.tasksCount} топшириқ</span>
+                <span className="font-medium">{org.completedTasks}/{org.totalTasks} топшириқ</span>
               </div>
               <div className="relative">
-                <Progress 
-                  value={org.rating} 
-                  className={cn(
-                    "h-3 transition-all duration-1000 ease-out",
-                    org.rating >= 90 ? "bg-emerald-600" : 
-                    org.rating >= 70 ? "bg-amber-600" : "bg-red-600"
-                  )}
-                />
+                <Progress value={org.completionRate} className="h-2" />
               </div>
             </div>
             

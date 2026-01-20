@@ -142,6 +142,7 @@ export interface Translations {
     middleName: string
     phone: string
     email: string
+    emailDesc: string
     oneIDConnected: string
     notificationSettings: string
     notificationDescription: string

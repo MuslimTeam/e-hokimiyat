@@ -142,6 +142,7 @@ export const enTranslations: Translations = {
     middleName: 'Middle Name',
     phone: 'Phone',
     email: 'Email',
+    emailDesc: 'Your email address for system login',
     oneIDConnected: 'OneID Connected',
     notificationSettings: 'Notification Settings',
     notificationDescription: 'Choose which notifications to receive',

@@ -142,6 +142,7 @@ export const uzTranslations: Translations = {
     middleName: 'Отасининг исми',
     phone: 'Телефон',
     email: 'Email',
+    emailDesc: 'Тизимга кириш учун сизнинг email манзилингиз',
     oneIDConnected: 'OneID уланган',
     notificationSettings: 'Билдиришнома созламалари',
     notificationDescription: 'Қандай хабарлар олишни бошқаринг',

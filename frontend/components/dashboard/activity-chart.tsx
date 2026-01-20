@@ -1,27 +1,56 @@
+// @ts-nocheck
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { BarChart3 } from "lucide-react"
+import React from "react"
+import { getAnalyticsTrends } from "@/lib/api"
 
-const data = [
-  { month: "Январ", bajarildi: 20, yaratildi: 25, jami: 45 },
-  { month: "Феврал", bajarildi: 25, yaratildi: 28, jami: 53 },
-  { month: "Март", bajarildi: 32, yaratildi: 35, jami: 67 },
-  { month: "Апрел", bajarildi: 28, yaratildi: 30, jami: 58 },
-  { month: "Май", bajarildi: 22, yaratildi: 25, jami: 47 },
-  { month: "Июн", bajarildi: 35, yaratildi: 38, jami: 73 },
-]
+type ChartPoint = {
+  period: string
+  bajarildi: number
+  yaratildi: number
+  jami: number
+}
 
 export function ActivityChart() {
+  const [data, setData] = React.useState<ChartPoint[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    let mounted = true
+    setIsLoading(true)
+    getAnalyticsTrends()
+      .then((trends) => {
+        if (!mounted) return
+        const mapped = trends.map((t: any) => ({
+          period: t.period,
+          yaratildi: t.created ?? 0,
+          bajarildi: t.completed ?? 0,
+          jami: (t.created ?? 0) + (t.completed ?? 0),
+        }))
+        setData(mapped)
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (mounted) setIsLoading(false)
+      })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const last = data.length > 0 ? data[data.length - 1] : undefined
+
   return (
-    <Card className="card-modern">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl">
+      <CardHeader className="flex flex-row items-center justify-between rounded-t-2xl">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <BarChart3 className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center shadow-lg">
+            <BarChart3 className="w-4 h-4 text-primary-foreground" />
           </div>
-          <CardTitle className="text-lg font-semibold">Топшириқлар динамикаси</CardTitle>
+          <CardTitle className="text-lg font-semibold text-foreground">Топшириқлар динамикаси</CardTitle>
         </div>
       </CardHeader>
       
@@ -51,7 +80,7 @@ export function ActivityChart() {
               />
               
               <XAxis 
-                dataKey="month" 
+                dataKey="period" 
                 stroke="hsl(240, 5%, 50%)" 
                 fontSize={12} 
                 tickLine={false}
@@ -135,18 +164,18 @@ export function ActivityChart() {
         
         {/* Stats summary */}
         <div className="mt-6 grid grid-cols-3 gap-4">
-          <div className="text-center p-3 rounded-lg bg-green-50 border border-green-200">
-            <div className="text-2xl font-bold text-green-600">{data[data.length - 1].bajarildi}</div>
+          <div className="text-center p-3 rounded-lg bg-green-50/70 backdrop-blur-sm border border-green-200/50 hover:bg-green-100/70 transition-all duration-300">
+            <div className="text-2xl font-bold text-green-600">{isLoading ? "…" : (last?.bajarildi ?? 0)}</div>
             <div className="text-xs text-muted-foreground">Ойлик бажарилган</div>
           </div>
           
-          <div className="text-center p-3 rounded-lg bg-blue-50 border border-blue-200">
-            <div className="text-2xl font-bold text-blue-600">{data[data.length - 1].yaratildi}</div>
+          <div className="text-center p-3 rounded-lg bg-blue-50/70 backdrop-blur-sm border border-blue-200/50 hover:bg-blue-100/70 transition-all duration-300">
+            <div className="text-2xl font-bold text-blue-600">{isLoading ? "…" : (last?.yaratildi ?? 0)}</div>
             <div className="text-xs text-muted-foreground">Ойлик яратилган</div>
           </div>
           
-          <div className="text-center p-3 rounded-lg bg-amber-50 border border-amber-200">
-            <div className="text-2xl font-bold text-amber-600">{data[data.length - 1].jami}</div>
+          <div className="text-center p-3 rounded-lg bg-amber-50/70 backdrop-blur-sm border border-amber-200/50 hover:bg-amber-100/70 transition-all duration-300">
+            <div className="text-2xl font-bold text-amber-600">{isLoading ? "…" : (last?.jami ?? 0)}</div>
             <div className="text-xs text-muted-foreground">Ойлик жами</div>
           </div>
         </div>

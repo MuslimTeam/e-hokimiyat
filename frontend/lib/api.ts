@@ -1,4 +1,4 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001"
 
 export async function getNotifications() {
   const res = await fetch(`${API_BASE}/api/notifications`)
@@ -132,5 +132,72 @@ export async function postSettings(body: any) {
     body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error("Failed to update settings")
+  return res.json()
+}
+
+// Analytics endpoints
+export async function getAnalyticsDashboard() {
+  const res = await fetch(`${API_BASE}/api/analytics/dashboard`)
+  if (!res.ok) throw new Error("Failed to fetch dashboard analytics")
+  return res.json()
+}
+
+export async function getAnalyticsOrganizations() {
+  const res = await fetch(`${API_BASE}/api/analytics/organizations`)
+  if (!res.ok) throw new Error("Failed to fetch organization analytics")
+  return res.json()
+}
+
+export async function getAnalyticsUsers() {
+  const res = await fetch(`${API_BASE}/api/analytics/users`)
+  if (!res.ok) throw new Error("Failed to fetch user analytics")
+  return res.json()
+}
+
+export async function getAnalyticsTrends() {
+  const res = await fetch(`${API_BASE}/api/analytics/trends`)
+  if (!res.ok) throw new Error("Failed to fetch task trends")
+  return res.json()
+}
+
+// Appeals endpoints
+export async function getAppeals(params?: {
+  search?: string
+  status?: string
+  category?: string
+  priority?: string
+  district?: string
+  page?: number
+  limit?: number
+}) {
+  const query = new URLSearchParams()
+  if (params?.search) query.append('search', params.search)
+  if (params?.status) query.append('status', params.status)
+  if (params?.category) query.append('category', params.category)
+  if (params?.priority) query.append('priority', params.priority)
+  if (params?.district) query.append('district', params.district)
+  if (params?.page) query.append('page', params.page.toString())
+  if (params?.limit) query.append('limit', params.limit.toString())
+
+  const res = await fetch(`${API_BASE}/api/appeals?${query}`)
+  if (!res.ok) throw new Error("Failed to fetch appeals")
+  return res.json()
+}
+
+export async function getAppealById(id: string) {
+  const res = await fetch(`${API_BASE}/api/appeals/${id}`)
+  if (!res.ok) throw new Error("Failed to fetch appeal")
+  return res.json()
+}
+
+export async function getAppealStats() {
+  const res = await fetch(`${API_BASE}/api/appeals/stats/summary`)
+  if (!res.ok) throw new Error("Failed to fetch appeal stats")
+  return res.json()
+}
+
+export async function getAppealOptions() {
+  const res = await fetch(`${API_BASE}/api/appeals/options/lists`)
+  if (!res.ok) throw new Error("Failed to fetch appeal options")
   return res.json()
 }

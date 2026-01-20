@@ -72,58 +72,82 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md bg-card border-border">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-            <Shield className="h-8 w-8 text-primary-foreground" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl font-bold">{t.auth.systemName}</CardTitle>
-            <CardDescription className="mt-2">{t.auth.systemDescription}</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 flex items-center justify-center p-4">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-emerald-400/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-emerald-400/20 to-purple-400/20 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Main Card */}
+        <Card className="bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl rounded-3xl overflow-hidden">
+          <CardHeader className="text-center space-y-6 p-8 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+              <Shield className="h-10 w-10 text-primary-foreground" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-3xl font-bold text-foreground">{t.auth.systemName}</CardTitle>
+              <CardDescription className="text-muted-foreground text-base">{t.auth.systemDescription}</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6 p-8">
           {step === "initial" && (
             <>
-              <Alert className="border-primary/30 bg-primary/5">
+              <Alert className="border-primary/30 bg-primary/10 rounded-2xl">
                 <Info className="h-4 w-4 text-primary" />
-                <AlertDescription className="text-sm">
+                <AlertDescription className="text-sm text-primary/90">
                   {t.auth.loginWithOneId}
                 </AlertDescription>
               </Alert>
 
-              <div className="space-y-2">
-                <Label htmlFor="pnfl">{t.auth.pnflLabel}</Label>
+              <div className="space-y-3">
+                <Label htmlFor="pnfl" className="text-sm font-semibold text-foreground">{t.auth.pnflLabel}</Label>
                 <Input
                   id="pnfl"
                   placeholder={t.auth.pnflPlaceholder}
                   value={pnfl}
                   onChange={(e) => setPnfl(e.target.value.replace(/\D/g, "").slice(0, 14))}
                   maxLength={14}
-                  className="font-mono text-lg tracking-wider"
+                  className="font-mono text-lg tracking-wider h-12 border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl bg-background/50 backdrop-blur-sm"
                 />
-                {error && <p className="text-sm text-destructive">{error}</p>}
+                {error && <p className="text-sm text-destructive font-medium">{error}</p>}
                 <p className="text-xs text-muted-foreground">{t.auth.pnflExample}</p>
               </div>
 
-              <Button className="w-full h-12 text-base" size="lg" onClick={handlePnflCheck} disabled={pnfl.length < 14}>
+              <Button
+                className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                size="lg"
+                onClick={handlePnflCheck}
+                disabled={pnfl.length < 14}
+              >
                 {t.auth.check}
               </Button>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
+                  <span className="w-full border-t border-border/50" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">{t.common.or}</span>
+                  <span className="bg-card/80 px-3 py-1 rounded-full text-muted-foreground font-medium border border-border/50">{t.common.or}</span>
                 </div>
               </div>
 
-              <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-2">
-                <p className="text-sm font-medium text-foreground">{t.auth.demoLogin}</p>
-                <p className="text-xs text-muted-foreground">{t.auth.demoDescription}</p>
-                <Button variant="outline" className="w-full mt-2 bg-transparent" onClick={handleDemoLogin}>
+              <div className="rounded-2xl border border-border/50 bg-secondary/20 backdrop-blur-sm p-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">⚡</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{t.auth.demoLogin}</p>
+                    <p className="text-xs text-muted-foreground">{t.auth.demoDescription}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full mt-3 bg-background/50 border-border/50 hover:bg-background hover:border-primary/30 rounded-xl transition-all duration-300"
+                  onClick={handleDemoLogin}
+                >
                   {t.auth.demoLogin}
                 </Button>
               </div>
@@ -131,72 +155,101 @@ export default function LoginPage() {
           )}
 
           {step === "checking" && (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <p className="text-muted-foreground">{t.auth.checking}</p>
+            <div className="flex flex-col items-center justify-center py-12 space-y-6">
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary-foreground" />
+                </div>
+                <div className="absolute -inset-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-3xl animate-pulse" />
+              </div>
+              <div className="text-center space-y-2">
+                <p className="text-muted-foreground font-medium">{t.auth.checking}</p>
+                <p className="text-xs text-muted-foreground">Илтимос, кутинг...</p>
+              </div>
             </div>
           )}
 
           {step === "oneid_redirect" && (
-            <div className="space-y-4">
-              <div className="flex flex-col items-center text-center py-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 mb-4">
-                  <CheckCircle2 className="h-6 w-6 text-accent" />
+            <div className="space-y-6">
+              <div className="flex flex-col items-center text-center py-6">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <CheckCircle2 className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="absolute -inset-2 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-3xl animate-pulse" />
                 </div>
-                <h3 className="font-semibold text-foreground">{t.auth.userFound}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h3 className="font-bold text-foreground text-xl">{t.auth.userFound}</h3>
+                <p className="text-muted-foreground">
                   {t.auth.activateProfile}
                 </p>
               </div>
 
-              <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
-                <p className="text-xs text-muted-foreground">{t.auth.pnflLabel}</p>
-                <p className="font-mono font-medium">***{pnfl.slice(-4)}</p>
+              <div className="rounded-2xl border border-border/50 bg-muted/30 backdrop-blur-sm p-4 space-y-2">
+                <p className="text-xs text-muted-foreground font-medium">{t.auth.pnflLabel}</p>
+                <p className="font-mono font-bold text-lg text-foreground">***{pnfl.slice(-4)}</p>
               </div>
 
-              <Button className="w-full h-12 text-base gap-2" size="lg" onClick={handleOneIdLogin}>
+              <Button
+                className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 gap-2"
+                size="lg"
+                onClick={handleOneIdLogin}
+              >
                 <ExternalLink className="h-5 w-5" />
                 {t.auth.loginWithOneId}
               </Button>
 
-              <Button variant="ghost" className="w-full" onClick={resetForm}>
+              <Button
+                variant="ghost"
+                className="w-full bg-muted/20 hover:bg-muted/30 rounded-xl transition-all duration-300"
+                onClick={resetForm}
+              >
                 {t.auth.differentPnfl}
               </Button>
             </div>
           )}
 
           {step === "not_found" && (
-            <div className="space-y-4">
-              <div className="flex flex-col items-center text-center py-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 mb-4">
-                  <XCircle className="h-6 w-6 text-destructive" />
+            <div className="space-y-6">
+              <div className="flex flex-col items-center text-center py-6">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <XCircle className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="absolute -inset-2 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-3xl animate-pulse" />
                 </div>
-                <h3 className="font-semibold text-foreground">{t.auth.userNotFound}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h3 className="font-bold text-foreground text-xl">{t.auth.userNotFound}</h3>
+                <p className="text-muted-foreground">
                   {t.auth.securityNote}
                 </p>
               </div>
 
-              <Alert variant="destructive" className="border-destructive/30 bg-destructive/5">
-                <AlertDescription className="text-sm">
+              <Alert variant="destructive" className="border-destructive/30 bg-destructive/10 rounded-2xl">
+                <AlertDescription className="text-sm text-destructive/90">
                   {t.auth.securityNote}
                 </AlertDescription>
               </Alert>
 
-              <Button variant="outline" className="w-full bg-transparent" onClick={resetForm}>
+              <Button
+                variant="outline"
+                className="w-full bg-background/50 border-border/50 hover:bg-background hover:border-primary/30 rounded-xl transition-all duration-300"
+                onClick={resetForm}
+              >
                 {t.auth.retry}
               </Button>
             </div>
           )}
 
           {step === "success" && (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
-                <CheckCircle2 className="h-8 w-8 text-accent" />
+            <div className="flex flex-col items-center justify-center py-12 space-y-6">
+              <div className="relative">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center shadow-xl">
+                  <CheckCircle2 className="h-10 w-10 text-white" />
+                </div>
+                <div className="absolute -inset-3 bg-gradient-to-br from-green-500/30 to-emerald-600/30 rounded-[2rem] animate-pulse" />
               </div>
-              <div className="text-center">
-                <h3 className="font-semibold text-foreground">{t.auth.success}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{t.auth.profileActivated}</p>
+              <div className="text-center space-y-2">
+                <h3 className="font-bold text-foreground text-2xl">{t.auth.success}</h3>
+                <p className="text-muted-foreground">{t.auth.profileActivated}</p>
               </div>
             </div>
           )}

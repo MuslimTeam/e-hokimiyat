@@ -275,7 +275,7 @@ export default function TaskDetailPage() {
                     <div>
                       <p className="text-muted-foreground">Muddat</p>
                       <p className={cn("font-medium", isOverdue && "text-destructive")}>
-                        {new Date(task.deadline).toLocaleDateString("uz-UZ")}
+                        {new Date(task.deadline).toLocaleDateString('en-GB')}
                         {isOverdue && " (kechiktirilgan)"}
                       </p>
                     </div>
@@ -319,7 +319,7 @@ export default function TaskDetailPage() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Yaratilgan</p>
-                      <p className="font-medium">{new Date(task.createdAt).toLocaleDateString("uz-UZ")}</p>
+                      <p className="font-medium">{new Date(task.createdAt).toLocaleDateString('en-GB')}</p>
                     </div>
                   </div>
 

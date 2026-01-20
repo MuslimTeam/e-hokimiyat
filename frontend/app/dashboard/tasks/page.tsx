@@ -10,7 +10,7 @@ import { getTasks, getOrganizations } from "@/lib/api"
 import { TaskStatusBadge, PriorityBadge } from "@/components/ui/status-badge"
 import { Plus, Search, Filter, Calendar, Building2, MoreHorizontal, Eye, Edit, Trash2, Layers } from "lucide-react"
 import { useState, useEffect } from "react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import {
   Dialog,
   DialogContent,
@@ -49,137 +49,43 @@ export default function TasksPage() {
     // Always auto-calculate when priority changes
     if (priority) {
       const today = new Date()
-      const deadline = new Date(today)
-      switch (priority) {
-        case "MUHIM_SHOSHILINCH":
-          deadline.setDate(today.getDate() + 1)
-          console.log("Setting deadline to +1 day:", deadline)
-          break
-        case "MUHIM":
-          deadline.setDate(today.getDate() + 3)
-          console.log("Setting deadline to +3 days:", deadline)
-          break
-        case "SHOSHILINCH_EMAS":
-          deadline.setDate(today.getDate() + 5)
-          console.log("Setting deadline to +5 days:", deadline)
-          break
-        case "ODDIY":
-          deadline.setDate(today.getDate() + 7)
-          console.log("Setting deadline to +7 days:", deadline)
-          break
-      }
-      // Format date as YYYY-MM-DD
-      const year = deadline.getFullYear()
-      const month = String(deadline.getMonth() + 1).padStart(2, '0')
-      const day = String(deadline.getDate()).padStart(2, '0')
-      const deadlineString = `${year}-${month}-${day}`
-      console.log("Final deadline string:", deadlineString)
-      setTaskDeadline(deadlineString)
-    }
-  }
-
-  // Handle manual deadline change
-  const handleDeadlineChange = (date: string) => {
-    console.log("Manual deadline change to:", date)
-    
-    // Validate and format date
-    if (date) {
-      // Ensure the date is in YYYY-MM-DD format
-      const dateObj = new Date(date)
-      if (!isNaN(dateObj.getTime())) {
-        const year = dateObj.getFullYear()
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0')
-        const day = String(dateObj.getDate()).padStart(2, '0')
-        const formattedDate = `${year}-${month}-${day}`
-        console.log("Formatted date:", formattedDate)
-        setTaskDeadline(formattedDate)
-      } else {
-        console.log("Invalid date format")
-        setTaskDeadline("")
-      }
-    } else {
-      setTaskDeadline("")
-    }
-  }
-
-  const filteredTasks = tasks.filter((task) => {
-    const matchesStatus = statusFilter === "all" || task.status === statusFilter
-    const matchesPriority = priorityFilter === "all" || task.priority === priorityFilter
-    const matchesSector = sectorFilter === "all" || task.sector === sectorFilter
-    const matchesSearch =
-      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (task.description || "").toLowerCase().includes(searchQuery.toLowerCase())
-    
-    // Deadline filtering
-    let matchesDeadline = true
-    if (deadlineFilter !== "all") {
-      const today = new Date()
-      const deadlineDate = new Date(task.deadline)
-      const diffDays = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      let deadlineDays = 7 // default for normal priority
       
-      switch (deadlineFilter) {
-        case "overdue":
-          matchesDeadline = diffDays < 0
+      switch (priority) {
+        case "urgent":
+          deadlineDays = 1
           break
-        case "today":
-          matchesDeadline = diffDays === 0
+        case "high":
+          deadlineDays = 3
           break
-        case "3days":
-          matchesDeadline = diffDays > 0 && diffDays <= 3
+        case "normal":
+          deadlineDays = 7
           break
-        case "week":
-          matchesDeadline = diffDays > 0 && diffDays <= 7
-          break
-        case "month":
-          matchesDeadline = diffDays > 0 && diffDays <= 30
+        case "low":
+          deadlineDays = 14
           break
       }
+      
+      const deadline = new Date(today)
+      deadline.setDate(today.getDate() + deadlineDays)
+      setTaskDeadline(deadline.toISOString().split('T')[0])
     }
-    
-    return matchesStatus && matchesPriority && matchesSector && matchesSearch && matchesDeadline
-  })
-
-  const toggleOrg = (orgId: string) => {
-    setSelectedOrgs((prev) => (prev.includes(orgId) ? prev.filter((id) => id !== orgId) : [...prev, orgId]))
-  }
-
-  // Reset form when dialog closes
-  const resetForm = () => {
-    setSelectedPriority("")
-    setTaskDeadline("")
-    setSelectedSector("")
-    setSelectedOrgs([])
   }
 
   const handleCreateTask = () => {
-    // Get form values
-    const titleInput = document.getElementById('taskTitle') as HTMLInputElement
-    const descriptionInput = document.getElementById('taskDescription') as HTMLTextAreaElement
-    
-    if (!titleInput?.value || !descriptionInput?.value || !selectedPriority || !taskDeadline || !selectedSector || selectedOrgs.length === 0) {
-      alert('Илтимос, барча мажбурий майдонларни тўлдиринг!')
-      return
-    }
-
-    // Create new task object
-    const newTask = {
-      id: Date.now().toString(),
-      title: titleInput.value,
-      description: descriptionInput.value,
-      priority: selectedPriority,
-      deadline: taskDeadline,
-      sector: selectedSector,
-      organizations: selectedOrgs,
-      status: "YANGI",
-      createdAt: new Date().toISOString(),
-      createdBy: "1"
-    }
-
-    // Add to tasks list
-    setTasks(prev => [...prev, newTask])
+    // Create task logic here
+    console.log("Creating task with:", {
+      selectedOrgs,
+      selectedSector,
+      selectedPriority,
+      taskDeadline
+    })
     
     // Reset form and close dialog
-    resetForm()
+    setSelectedOrgs([])
+    setSelectedSector("")
+    setSelectedPriority("")
+    setTaskDeadline("")
     setIsCreateOpen(false)
   }
 
@@ -201,196 +107,144 @@ export default function TasksPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
-        
-        <div className="relative z-10 p-6 space-y-8">
-          {/* Filters Section */}
-          <section className="animate-slide-up">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">📋</span>
+      <div className="min-h-screen bg-background pt-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-8 py-8">
+
+            {/* Header Section */}
+            <section className="animate-slide-up">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-2xl">📋</span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Топшириқлар</h1>
+                  <p className="text-lg text-muted-foreground">Барча топшириқларни бошқариш ва кузатув</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Топшириқлар</h2>
-                <p className="text-sm text-gray-500">Барча топшириқлар рўйхати ва бошқаруви</p>
-              </div>
-            </div>
-            
-            <Card className="card-modern">
-              <CardContent className="p-4">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  {/* Search and main filters */}
-                  <div className="flex flex-1 flex-col gap-3 lg:flex-row lg:items-center">
-                    <div className="relative flex-1 lg:max-w-md">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              
+              {/* Filters */}
+              <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-md p-6">
+                <div className="flex flex-wrap gap-4 mb-6">
+                  <div className="flex-1 min-w-[200px]">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                       <Input
-                        placeholder="Топшириқ қидириш..."
+                        placeholder="Топшириқни қидириш..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250"
+                        className="pl-10 bg-background/50 border-border/50"
                       />
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2">
-                      <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[140px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
-                          <Filter className="mr-2 h-3 w-3 text-gray-400" />
-                          <SelectValue placeholder="Ҳолат" />
-                        </SelectTrigger>
-                        <SelectContent className="glass">
-                          <SelectItem value="all">Барча ҳолатлар</SelectItem>
-                          {(Object.keys(taskStatusLabels) as TaskStatus[]).map((status) => (
-                            <SelectItem key={status} value={status}>
-                              {taskStatusLabels[status]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      
-                      <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                        <SelectTrigger className="w-[130px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
-                          <SelectValue placeholder="Устуворлик" />
-                        </SelectTrigger>
-                        <SelectContent className="glass">
-                          <SelectItem value="all">Барча устуворликлар</SelectItem>
-                          {(Object.keys(priorityLabels) as TaskPriority[]).map((priority) => (
-                            <SelectItem key={priority} value={priority}>
-                              {priorityLabels[priority]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      
-                      <Select value={deadlineFilter} onValueChange={setDeadlineFilter}>
-                        <SelectTrigger className="w-[140px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
-                          <Calendar className="mr-2 h-3 w-3 text-gray-400" />
-                          <SelectValue placeholder="Муддат" />
-                        </SelectTrigger>
-                        <SelectContent className="glass">
-                          <SelectItem value="all">Барча муддатлар</SelectItem>
-                          <SelectItem value="overdue">Кечикган</SelectItem>
-                          <SelectItem value="today">Бугун</SelectItem>
-                          <SelectItem value="3days">3 кунгача</SelectItem>
-                          <SelectItem value="week">Ҳафтагача</SelectItem>
-                          <SelectItem value="month">Ойгача</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      <Select value={sectorFilter} onValueChange={setSectorFilter}>
-                        <SelectTrigger className="w-[150px] h-10 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
-                          <Layers className="mr-2 h-3 w-3 text-gray-400" />
-                          <SelectValue placeholder="Сўҳа" />
-                        </SelectTrigger>
-                        <SelectContent className="glass">
-                          <SelectItem value="all">Барча сўҳалар</SelectItem>
-                          {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
-                            <SelectItem key={sector} value={sector}>
-                              {sectorLabels[sector]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     </div>
                   </div>
                   
-                  {/* Create button */}
-                  <Dialog open={isCreateOpen} onOpenChange={(open) => {
-                    setIsCreateOpen(open)
-                    if (!open) {
-                      resetForm()
-                    }
-                  }}>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                      <SelectValue placeholder="Ҳолат" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Барча ҳолатлар</SelectItem>
+                      {Object.entries(taskStatusLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                    <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                      <SelectValue placeholder="Муҳимлик" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Барча муҳимликлар</SelectItem>
+                      {Object.entries(priorityLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={sectorFilter} onValueChange={setSectorFilter}>
+                    <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                      <SelectValue placeholder="Соҳа" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Барча соҳалар</SelectItem>
+                      {Object.entries(sectorLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                      <Button className="bg-emerald-600 hover:bg-emerald-700 text-white h-10 px-4 transition-all duration-250">
+                      <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
                         <Plus className="mr-2 h-4 w-4" />
                         Янги топшириқ
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] max-h-[75vh] overflow-y-auto bg-white border border-gray-200 shadow-lg my-4">
+                    <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50">
                       <DialogHeader>
-                        <DialogTitle className="text-gray-900">Янги топшириқ яратиш</DialogTitle>
+                        <DialogTitle>Янги топшириқ яратиш</DialogTitle>
                         <DialogDescription>
-                          Топшириқ маълумотларини киритинг ва ташкилотларни танланг
+                          Янги топшириқ маълумотларини киритинг
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="space-y-6 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="taskTitle">Топшириқ сарлавҳаси *</Label>
-                          <Input
-                            id="taskTitle"
-                            placeholder="Топшириқ сарлавҳасини киритинг..."
-                            className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="taskDescription">Топшириқ тавсифи *</Label>
-                          <Textarea
-                            id="taskDescription"
-                            placeholder="Топшириқ ҳақида тўлиқ маълумот..."
-                            className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250 min-h-[100px]"
-                          />
-                        </div>
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="taskPriority">Устуворлик *</Label>
-                            <Select value={selectedPriority} onValueChange={handlePriorityChange}>
-                              <SelectTrigger className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250 text-xs h-10">
-                                <SelectValue placeholder="Устуворликни танланг" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-white border border-gray-200 shadow-lg" position="popper" sideOffset={10} avoidCollisions={true}>
-                                {(Object.keys(priorityLabels) as TaskPriority[]).map((priority) => (
-                                  <SelectItem key={priority} value={priority}>
-                                    {priorityLabels[priority]}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="taskDeadline">Муддат *</Label>
-                            <Input
-                              id="taskDeadline"
-                              type="date"
-                              value={taskDeadline}
-                              onChange={(e) => handleDeadlineChange(e.target.value)}
-                              className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250 z-10"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="taskSector">Сохалар *</Label>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="sector">Соҳа</Label>
                           <Select value={selectedSector} onValueChange={setSelectedSector}>
-                            <SelectTrigger className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
-                              <SelectValue placeholder="Сохаларни танланг" />
+                            <SelectTrigger className="bg-background/50 border-border/50">
+                              <SelectValue placeholder="Соҳани танланг" />
                             </SelectTrigger>
-                            <SelectContent className="glass" position="popper" sideOffset={10} avoidCollisions={true}>
-                              {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
-                                <SelectItem key={sector} value={sector}>
-                                  {sectorLabels[sector]}
-                                </SelectItem>
+                            <SelectContent>
+                              {Object.entries(sectorLabels).map(([value, label]) => (
+                                <SelectItem key={value} value={value}>{label}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label>Ташкилотлар *</Label>
-                          <div className="space-y-3 max-h-[200px] overflow-y-auto p-3 border border-gray-200 rounded-lg bg-gray-50">
-                            {Object.values(orgsMap).map((org) => (
+                        <div>
+                          <Label htmlFor="priority">Муҳимлик</Label>
+                          <Select value={selectedPriority} onValueChange={handlePriorityChange}>
+                            <SelectTrigger className="bg-background/50 border-border/50">
+                              <SelectValue placeholder="Муҳимликни танланг" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(priorityLabels).map(([value, label]) => (
+                                <SelectItem key={value} value={value}>{label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="deadline">Муддат</Label>
+                          <Input
+                            type="date"
+                            value={taskDeadline}
+                            onChange={(e) => setTaskDeadline(e.target.value)}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label>Ташкилотлар</Label>
+                          <div className="space-y-2 max-h-32 overflow-y-auto">
+                            {Object.values(orgsMap).map((org: any) => (
                               <div key={org.id} className="flex items-center space-x-2">
                                 <Checkbox
-                                  id={`org-${org.id}`}
+                                  id={org.id}
                                   checked={selectedOrgs.includes(org.id)}
-                                  onCheckedChange={() => toggleOrg(org.id)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setSelectedOrgs([...selectedOrgs, org.id])
+                                    } else {
+                                      setSelectedOrgs(selectedOrgs.filter(id => id !== org.id))
+                                    }
+                                  }}
                                 />
-                                <Label 
-                                  htmlFor={`org-${org.id}`}
-                                  className="text-sm font-normal cursor-pointer"
-                                >
+                                <Label htmlFor={org.id} className="text-sm">
                                   {org.name}
                                 </Label>
                               </div>
@@ -398,112 +252,97 @@ export default function TasksPage() {
                           </div>
                         </div>
                       </div>
+                      
                       <DialogFooter>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => {
-                            resetForm()
-                            setIsCreateOpen(false)
-                          }}
-                          className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-250"
-                        >
+                        <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                           Бекор қилиш
                         </Button>
-                        <Button 
-                          onClick={handleCreateTask}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-250"
-                        >
-                          <Plus className="mr-2 h-4 w-4" />
-                          Топшириқ яратиш
+                        <Button onClick={handleCreateTask} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                          Яратиш
                         </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>
-              </CardContent>
-            </Card>
-          </section>
+              </div>
+            </section>
 
-          {/* Tasks Table */}
-          <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
-            <Card className="card-modern">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gray-200 hover:bg-gray-50 transition-colors duration-250">
-                      <TableHead className="text-gray-700 font-semibold">Сарлавҳа</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Сўҳа</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Устуворлик</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Ҳолат</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Ташкилот</TableHead>
-                      <TableHead className="text-gray-700 font-semibold">Муддат</TableHead>
-                      <TableHead className="text-gray-700 font-semibold w-[50px]"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTasks.map((task) => (
-                      <TableRow key={task.id} className="border-gray-200 hover:bg-emerald-50 transition-colors duration-250">
-                        <TableCell>
-                          <Link href={`/dashboard/tasks/${task.id}`} className="block hover:text-emerald-600 transition-colors duration-250">
-                            <p className="font-medium text-gray-900">{task.title}</p>
-                            <p className="text-sm text-gray-500 line-clamp-1">{task.description}</p>
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="font-normal border-gray-300 text-gray-700 bg-gray-50">
-                            {sectorLabels[task.sector]}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <PriorityBadge priority={task.priority} />
-                        </TableCell>
-                        <TableCell>
-                          <TaskStatusBadge status={task.status} />
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Building2 className="h-4 w-4 text-gray-400" />
-                            <span className="truncate max-w-[150px]">{(task.organizations || []).map((id: string) => orgsMap[id]?.name).filter(Boolean).join(", ")}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            {new Date(task.deadline).toLocaleDateString("uz-UZ")}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
-                              <Link href={`/dashboard/tasks/${task.id}`}>
-                                <DropdownMenuItem className="hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  Кўриш
-                                </DropdownMenuItem>
-                              </Link>
-                              <DropdownMenuItem className="hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
-                                <Edit className="mr-2 h-4 w-4" />
-                                Таҳрирлаш
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600 hover:bg-red-50 transition-all duration-250">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Ўчириш
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+            {/* Tasks Table */}
+            <section className="animate-slide-up">
+              <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/30">
+                        <TableHead className="px-6 py-4 font-semibold text-foreground">Топшириқ</TableHead>
+                        <TableHead className="px-6 py-4 font-semibold text-foreground">Ташкилот</TableHead>
+                        <TableHead className="px-6 py-4 font-semibold text-foreground">Ҳолат</TableHead>
+                        <TableHead className="px-6 py-4 font-semibold text-foreground">Муҳимлик</TableHead>
+                        <TableHead className="px-6 py-4 font-semibold text-foreground">Муддат</TableHead>
+                        <TableHead className="px-6 py-4 font-semibold text-foreground text-right">Ҳаракатлар</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </section>
+                    </TableHeader>
+                    <TableBody>
+                      {tasks.map((task: any) => (
+                        <TableRow key={task.id} className="hover:bg-muted/20 transition-colors duration-200">
+                          <TableCell className="px-6 py-4">
+                            <div>
+                              <div className="font-medium text-foreground">{task.title}</div>
+                              <div className="text-sm text-muted-foreground mt-1">{task.description}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <Building2 className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-foreground">{orgsMap[task.organizationId]?.name || 'Номаълум'}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <TaskStatusBadge status={task.status} />
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <PriorityBadge priority={task.priority} />
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm text-foreground">{task.deadline}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-muted/20 hover:text-primary transition-all duration-300 rounded-lg">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl">
+                                <Link href={`/dashboard/tasks/${task.id}`}>
+                                  <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-lg">
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Батафсил кўриш
+                                  </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-lg">
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Таҳрирлаш
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive hover:bg-destructive/10 transition-all duration-300 rounded-lg">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Ўчириш
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </section>
+          </div>
         </div>
       </div>
     </>
