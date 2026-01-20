@@ -50,41 +50,132 @@ import {
   History,
 } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
-export default function UserDetailPage() {
-  const params = useParams()
-  const id = params.id as string
+export default function UserDetailPage({ params }: { params: { id: string } }) {
+  const id = params.id
+  
+  // Demo user data
+  const demoUser = {
+    id: id,
+    firstName: "Абдулла",
+    lastName: "Каримов",
+    middleName: "Бахтиёрович",
+    email: "abdulla.karimov@ehokimiyat.uz",
+    phone: "+998901234567",
+    role: "ADMIN",
+    position: "Туман ҳокимлиги раиси",
+    organizationId: "1",
+    department: "Бошқарув бўлими",
+    oneidConnected: true,
+    status: "FAOL",
+    pnfl: "123456789",
+    createdAt: "2024-01-15T09:00:00Z",
+    activatedAt: "2024-01-15T10:00:00Z",
+    lastLoginAt: "2024-01-20T08:30:00Z"
+  }
 
   const [isEditOpen, setIsEditOpen] = useState(false)
 
-  const [user, setUser] = useState<any | null>(null)
+  const [user, setUser] = useState<any>(demoUser)
   const [organization, setOrganization] = useState<any | null>(null)
   const [userTasks, setUserTasks] = useState<any[]>([])
   const [userAuditLogs, setUserAuditLogs] = useState<any[]>([])
   const [allOrgs, setAllOrgs] = useState<any[]>([])
 
+  // Demo tasks data
+  const demoTasks = [
+    {
+      id: "1",
+      title: "Иш сўрови ҳақида",
+      description: "Мен туман ҳокимлигидан иш сўравини олмоқчиман. Керакли ҳужжатлар рўйхати қайердан олиш мумкин?",
+      status: "BAJARILDI",
+      priority: "HIGH",
+      createdBy: id,
+      createdAt: "2024-01-18T10:00:00Z",
+      deadline: "2024-01-25T18:00:00Z",
+      organizations: ["1"]
+    },
+    {
+      id: "2", 
+      title: "Таълим сифати тўғрисида",
+      description: "Мактабда таълим сифати пасаётган борми? Бу ҳақда қандай чора кўрилади?",
+      status: "IJRODA",
+      priority: "MEDIUM",
+      createdBy: id,
+      createdAt: "2024-01-17T14:00:00Z",
+      deadline: "2024-01-30T18:00:00Z",
+      organizations: ["1"]
+    },
+    {
+      id: "3",
+      title: "Ҳудудий йиғимлар тўғрисида",
+      description: "Туман марказидаги йўлларни тозалаш ва ободон қилиш ишлари тўғрисида кўрилганлигини текшириш керак.",
+      status: "MUDDATI_KECH",
+      priority: "HIGH",
+      createdBy: id,
+      createdAt: "2024-01-15T09:00:00Z",
+      deadline: "2024-01-20T18:00:00Z",
+      organizations: ["1"]
+    }
+  ]
+
+  // Demo audit logs
+  const demoAuditLogs = [
+    {
+      id: "1",
+      action: "Фойдаланувчи қўширилди",
+      details: "Фойдаланувчи маълумотлари янгиланди",
+      userId: id,
+      targetId: id,
+      createdAt: "2024-01-20T08:30:00Z"
+    },
+    {
+      id: "2",
+      action: "Топшириқ яратилди",
+      details: "\"Иш сўрови ҳақида\" номли топшириқ яратилди",
+      userId: id,
+      targetId: "1",
+      createdAt: "2024-01-18T10:00:00Z"
+    },
+    {
+      id: "3",
+      action: "Логин қилди",
+      details: "Фойдаланувчи тизимга кириш муваффақиятли амалга ошди",
+      userId: id,
+      targetId: id,
+      createdAt: "2024-01-20T08:30:00Z"
+    }
+  ]
+
+  // Demo organizations
+  const demoOrgs = [
+    {
+      id: "1",
+      name: "Туман ҳокимлиги",
+      type: "GOVERNMENT"
+    }
+  ]
+
   useEffect(() => {
     let mounted = true
-    Promise.all([getUserById(id), getTasks(), getAuditLogs(), getOrganizations()])
-      .then(([u, tasks, audits, orgs]) => {
-        if (!mounted) return
-        setUser(u)
-        setUserTasks(tasks.filter((t: any) => (t.organizations || []).some((orgId: string) => orgId === u.organizationId) || t.createdBy === u.id))
-        setUserAuditLogs(audits.filter((log: any) => log.userId === u.id || log.targetId === u.id))
-        setAllOrgs(orgs)
-        setOrganization(orgs.find((o: any) => o.id === u.organizationId) || null)
-      })
-      .catch(() => {})
+    // Use demo data instead of API calls
+    if (mounted) {
+      setUser(demoUser)
+      setUserTasks(demoTasks)
+      setUserAuditLogs(demoAuditLogs)
+      setAllOrgs(demoOrgs)
+      setOrganization(demoOrgs[0])
+    }
     return () => {
       mounted = false
     }
   }, [id])
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("uz-UZ", {
+    return new Date(dateStr).toLocaleDateString('en-GB', {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -92,7 +183,7 @@ export default function UserDetailPage() {
   }
 
   const formatDateTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleString("uz-UZ", {
+    return new Date(dateStr).toLocaleString('en-GB', {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -117,22 +208,25 @@ export default function UserDetailPage() {
   return (
     <>
       <Header title="Foydalanuvchi ma'lumotlari" />
-      <div className="p-6 space-y-6">
+      <div className="min-h-screen bg-background pt-16 sm:pt-20 lg:pt-24">
+        <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="space-y-4 sm:space-y-6 py-4 sm:py-6">
         {/* Back button and actions */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link href="/dashboard/users">
-            <Button variant="ghost" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Orqaga
+            <Button variant="ghost" className="gap-2 h-10 px-3 sm:px-4">
+              <ArrowLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              <span className="text-sm sm:text-base">Orqaga</span>
             </Button>
           </Link>
 
           <div className="flex flex-wrap gap-2">
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Tahrirlash
+                <Button variant="outline" className="h-9 px-3 sm:px-4 text-xs sm:text-sm">
+                  <Edit className="mr-1 sm:mr-2 h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  <span className="hidden sm:inline">Tahrirlash</span>
+                  <span className="sm:hidden">Таҳр</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
@@ -171,7 +265,7 @@ export default function UserDetailPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {(Object.keys(roleLabels) as UserRole[]).map((role) => (
-                          <SelectItem key={role} value={role} disabled={role === "HOKIM"}>
+                          <SelectItem key={role} value={role} disabled={role === "TUMAN_HOKIMI"}>
                             {roleLabels[role]}
                           </SelectItem>
                         ))}
@@ -211,7 +305,7 @@ export default function UserDetailPage() {
                     variant="outline"
                     className="text-orange-500 border-orange-500/30 hover:bg-orange-500/10 bg-transparent"
                   >
-                    <Lock className="mr-2 h-4 w-4" />
+                    <Lock className="mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     Bloklash
                   </Button>
                 </AlertDialogTrigger>
@@ -233,7 +327,7 @@ export default function UserDetailPage() {
 
             {canUnblock && (
               <Button variant="outline" className="text-accent border-accent/30 hover:bg-accent/10 bg-transparent">
-                <Unlock className="mr-2 h-4 w-4" />
+                <Unlock className="mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 Blokdan chiqarish
               </Button>
             )}
@@ -245,7 +339,7 @@ export default function UserDetailPage() {
                     variant="outline"
                     className="text-destructive border-destructive/30 hover:bg-destructive/10 bg-transparent"
                   >
-                    <Archive className="mr-2 h-4 w-4" />
+                    <Archive className="mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     Arxivlash
                   </Button>
                 </AlertDialogTrigger>
@@ -266,13 +360,15 @@ export default function UserDetailPage() {
             )}
           </div>
         </div>
+          </div>
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* User Info Card */}
           <Card className="bg-card border-border">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <Avatar className="h-20 w-20 mb-4">
+                <Avatar className="h-16 w-16 sm:h-18 sm:w-18 lg:h-20 lg:w-20 mb-4">
                   <AvatarFallback className="bg-primary/10 text-primary text-2xl">
                     {user.firstName[0]}
                     {user.lastName[0]}
@@ -289,7 +385,7 @@ export default function UserDetailPage() {
 
                 {user.oneidConnected ? (
                   <Badge variant="outline" className="mt-3 bg-accent/10 text-accent border-accent/30">
-                    <UserCheck className="mr-1 h-3 w-3" />
+                    <UserCheck className="mr-1 h-2.5 w-2.5 sm:h-3 sm:w-3" />
                     OneID ulangan
                   </Badge>
                 ) : (
@@ -302,7 +398,7 @@ export default function UserDetailPage() {
               <div className="mt-6 space-y-4">
                 <div className="flex items-center gap-3 text-sm">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <Shield className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </div>
                   <div>
                     <p className="text-muted-foreground">PNFL</p>
@@ -313,7 +409,7 @@ export default function UserDetailPage() {
                 {user.phone && (
                   <div className="flex items-center gap-3 text-sm">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </div>
                     <div>
                       <p className="text-muted-foreground">Telefon</p>
@@ -325,7 +421,7 @@ export default function UserDetailPage() {
                 {organization && (
                   <div className="flex items-center gap-3 text-sm">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                      <Building2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </div>
                     <div>
                       <p className="text-muted-foreground">Tashkilot</p>
@@ -336,7 +432,7 @@ export default function UserDetailPage() {
 
                 <div className="flex items-center gap-3 text-sm">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </div>
                   <div>
                     <p className="text-muted-foreground">Qo'shilgan sana</p>
@@ -347,7 +443,7 @@ export default function UserDetailPage() {
                 {user.activatedAt && (
                   <div className="flex items-center gap-3 text-sm">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                      <UserCheck className="h-4 w-4 text-muted-foreground" />
+                      <UserCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </div>
                     <div>
                       <p className="text-muted-foreground">Faollashgan sana</p>
@@ -366,11 +462,11 @@ export default function UserDetailPage() {
                 <CardHeader className="border-b border-border pb-0">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="tasks" className="gap-2">
-                      <ClipboardList className="h-4 w-4" />
+                      <ClipboardList className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       Topshiriqlar
                     </TabsTrigger>
                     <TabsTrigger value="activity" className="gap-2">
-                      <History className="h-4 w-4" />
+                      <History className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       Faoliyat tarixi
                     </TabsTrigger>
                   </TabsList>
@@ -379,7 +475,7 @@ export default function UserDetailPage() {
                   <CardContent className="p-0">
                     {userTasks.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                        <ClipboardList className="h-12 w-12 mb-4 opacity-20" />
+                        <ClipboardList className="h-8 w-8 sm:h-10 sm:w-10 mb-4 opacity-20" />
                         <p>Topshiriqlar yo'q</p>
                       </div>
                     ) : (
@@ -414,7 +510,7 @@ export default function UserDetailPage() {
                   <CardContent className="p-4">
                     {userAuditLogs.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                        <History className="h-12 w-12 mb-4 opacity-20" />
+                        <History className="h-8 w-8 sm:h-10 sm:w-10 mb-4 opacity-20" />
                         <p>Faoliyat tarixi yo'q</p>
                       </div>
                     ) : (
@@ -422,7 +518,7 @@ export default function UserDetailPage() {
                         {userAuditLogs.map((log) => (
                           <div key={log.id} className="flex gap-3">
                             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                              <History className="h-4 w-4 text-primary" />
+                              <History className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                             </div>
                             <div className="space-y-1">
                               <p className="text-sm font-medium text-foreground">{log.action.replace(/_/g, " ")}</p>

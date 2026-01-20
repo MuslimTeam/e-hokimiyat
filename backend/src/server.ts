@@ -1,135 +1,76 @@
 import express from "express"
 import cors from "cors"
-import { users, organizations, tasks, chatMessages, notifications, taskExecutions, auditLogs, systemSettings } from "./data"
+import helmet from "helmet"
+import rateLimit from "express-rate-limit"
+import dotenv from "dotenv"
+
+// Import routes
+import authRoutes from "./routes/auth"
+import userRoutes from "./routes/users"
+import taskRoutes from "./routes/tasks"
+import organizationRoutes from "./routes/organizations"
+import analyticsRoutes from "./routes/analytics"
+import auditRoutes from "./routes/audit"
+import notificationRoutes from "./routes/notifications"
+import appealsRoutes from "./routes/appeals"
+
+// Load environment variables
+dotenv.config()
 
 const app = express()
-app.use(cors())
-app.use(express.json())
+
+// Security middleware
+app.use(helmet())
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true
+}))
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later."
+})
+app.use(limiter)
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true }))
 
 const API_PREFIX = "/api"
 
-app.get(`${API_PREFIX}/users`, (req, res) => {
-  res.json(users)
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() })
 })
 
-app.get(`${API_PREFIX}/users/:id`, (req, res) => {
-  const u = users.find((x) => x.id === req.params.id)
-  if (!u) return res.status(404).json({ message: "User not found" })
-  res.json(u)
+// API routes
+app.use(`${API_PREFIX}/auth`, authRoutes)
+app.use(`${API_PREFIX}/users`, userRoutes)
+app.use(`${API_PREFIX}/tasks`, taskRoutes)
+app.use(`${API_PREFIX}/organizations`, organizationRoutes)
+app.use(`${API_PREFIX}/analytics`, analyticsRoutes)
+app.use(`${API_PREFIX}/audit`, auditRoutes)
+app.use(`${API_PREFIX}/notifications`, notificationRoutes)
+app.use(`${API_PREFIX}/appeals`, appealsRoutes)
+
+// 404 handler
+app.use(`${API_PREFIX}/*`, (req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' })
 })
 
-app.get(`${API_PREFIX}/organizations`, (req, res) => {
-  res.json(organizations)
-})
-
-app.get(`${API_PREFIX}/tasks`, (req, res) => {
-  res.json(tasks)
-})
-
-app.get(`${API_PREFIX}/tasks/:id`, (req, res) => {
-  const t = tasks.find((x) => x.id === req.params.id)
-  if (!t) return res.status(404).json({ message: "Task not found" })
-  res.json(t)
-})
-
-app.post(`${API_PREFIX}/tasks`, (req, res) => {
-  const body = req.body
-  const id = String(tasks.length + 1)
-  const newTask = { id, ...body }
-  tasks.push(newTask)
-  res.status(201).json(newTask)
-})
-
-app.get(`${API_PREFIX}/tasks/:id/chat`, (req, res) => {
-  const msgs = chatMessages.filter((m) => m.taskId === req.params.id)
-  res.json(msgs)
-})
-
-app.post(`${API_PREFIX}/tasks/:id/chat`, (req, res) => {
-  const { senderId, type, content } = req.body
-  const id = String(chatMessages.length + 1)
-  const msg = { id, taskId: req.params.id, senderId, type, content, createdAt: new Date().toISOString() }
-  chatMessages.push(msg)
-  res.status(201).json(msg)
-})
-
-app.get(`${API_PREFIX}/tasks/:id/executions`, (req, res) => {
-  const ex = taskExecutions.filter((e) => e.taskId === req.params.id)
-  res.json(ex)
-})
-
-app.post(`${API_PREFIX}/tasks/:id/executions`, (req, res) => {
-  const { executedBy, actionType, comment } = req.body
-  const id = String(taskExecutions.length + 1)
-  const ex = { id, taskId: req.params.id, executedBy, actionType, comment, createdAt: new Date().toISOString() }
-  taskExecutions.push(ex)
-  // add audit log
-  const aId = String(auditLogs.length + 1)
-  auditLogs.push({ id: aId, userId: executedBy, action: actionType || "TASK_EXECUTED", details: comment || "", targetType: "task", targetId: req.params.id, createdAt: new Date().toISOString() })
-  res.status(201).json(ex)
-})
-
-app.get(`${API_PREFIX}/notifications`, (req, res) => {
-  res.json(notifications)
-})
-
-app.get(`${API_PREFIX}/notifications/unread-count`, (req, res) => {
-  const count = notifications.filter((n) => !n.read).length
-  res.json({ unread: count })
-})
-
-app.get(`${API_PREFIX}/audit`, (req, res) => {
-  res.json(auditLogs)
-})
-
-app.get(`${API_PREFIX}/settings`, (req, res) => {
-  res.json(systemSettings)
-})
-
-app.post(`${API_PREFIX}/settings`, (req, res) => {
-  const body = req.body || {}
-  Object.assign(systemSettings, body)
-  const aId = String(auditLogs.length + 1)
-  auditLogs.push({ id: aId, userId: body.userId || "system", action: "SETTINGS_UPDATED", details: JSON.stringify(body), targetType: "settings", targetId: "", createdAt: new Date().toISOString() })
-  res.json(systemSettings)
-})
-
-// Users create / update
-app.post(`${API_PREFIX}/users`, (req, res) => {
-  const body = req.body
-  const id = String(users.length + 1)
-  const u = { id, ...body }
-  users.push(u)
-  res.status(201).json(u)
-})
-
-app.put(`${API_PREFIX}/users/:id`, (req, res) => {
-  const idx = users.findIndex((u) => u.id === req.params.id)
-  if (idx === -1) return res.status(404).json({ message: "User not found" })
-  users[idx] = { ...users[idx], ...req.body }
-  res.json(users[idx])
-})
-
-// mark notification read
-app.patch(`${API_PREFIX}/notifications/:id/read`, (req, res) => {
-  const n = notifications.find((x) => x.id === req.params.id)
-  if (!n) return res.status(404).json({ message: "Notification not found" })
-  n.read = true
-  res.json(n)
-})
-
-// update task
-app.put(`${API_PREFIX}/tasks/:id`, (req, res) => {
-  const idx = tasks.findIndex((t) => t.id === req.params.id)
-  if (idx === -1) return res.status(404).json({ message: "Task not found" })
-  tasks[idx] = { ...tasks[idx], ...req.body }
-  const aId = String(auditLogs.length + 1)
-  auditLogs.push({ id: aId, userId: req.body.updatedBy || "system", action: "TASK_UPDATED", details: JSON.stringify(req.body), targetType: "task", targetId: req.params.id, createdAt: new Date().toISOString() })
-  res.json(tasks[idx])
+// Global error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Global error:', err)
+  res.status(500).json({
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  })
 })
 
 const port = process.env.PORT || 4000
 app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Backend API listening on http://localhost:${port}${API_PREFIX}`)
+  console.log(`🚀 Backend API listening on http://localhost:${port}${API_PREFIX}`)
+  console.log(`📊 Health check: http://localhost:${port}/health`)
 })

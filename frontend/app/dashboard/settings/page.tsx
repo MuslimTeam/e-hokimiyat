@@ -48,9 +48,25 @@ export default function SettingsPage() {
   const [botUsername, setBotUsername] = useState("")
   const [showToken, setShowToken] = useState(false)
   const [tokenSaved, setTokenSaved] = useState(false)
-  const [smtpHost, setSmtpHost] = useState("")
-  const [smtpPort, setSmtpPort] = useState("")
-  const [senderEmail, setSenderEmail] = useState("")
+  const [currentUser, setCurrentUser] = useState({
+    id: "1",
+    firstName: "Абдулла",
+    lastName: "Каримов",
+    middleName: "Бахтиёрович",
+    email: "abdulla.karimov@ehokimiyat.uz",
+    phone: "+998901234567",
+    role: "Администратор",
+    position: "Туман ҳокимлиги раиси",
+    organizationId: "1",
+    department: "Бошқарув бўлими",
+    oneidConnected: true,
+    createdAt: "2024-01-15T09:00:00Z",
+    activatedAt: "2024-01-15T10:00:00Z",
+    lastLoginAt: "2024-01-20T08:30:00Z"
+  })
+  const [smtpHost, setSmtpHost] = useState("smtp.gmail.com")
+  const [smtpPort, setSmtpPort] = useState("587")
+  const [senderEmail, setSenderEmail] = useState("noreply@ehokimiyat.uz")
 
   useEffect(() => {
     let mounted = true
@@ -90,7 +106,6 @@ export default function SettingsPage() {
     } catch (e) {}
   }, [language])
 
-  const currentUser = { firstName: "Admin", lastName: "User", middleName: "", phone: "", pnfl: "12345678901234", role: "ADMIN" }
   const isAdmin = currentUser.role === "ADMIN"
 
   // Mock data for applications (Murojatlar)
@@ -142,67 +157,90 @@ export default function SettingsPage() {
   }
 
   return (
-    <React.Fragment>
-      <Header title={t.settings.title} description={t.settings.description} />
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto">
-          <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="flex space-x-1 border-b border-gray-200">
+    <>
+      <div className="min-h-screen bg-background pt-16 sm:pt-20 lg:pt-24">
+        <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="space-y-4 sm:space-y-6 lg:space-y-8 py-4 sm:py-6 lg:py-8">
+
+            {/* Header Section */}
+            <section className="animate-slide-up">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-14 bg-gradient-to-br from-slate-500 to-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <Settings className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-7 text-white" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">{t.settings.title}</h1>
+                  <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">{t.settings.description}</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Settings Tabs */}
+            <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
+              <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-1 border-b border-gray-200">
               <TabsTrigger 
                 value="profile" 
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+                className="px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <User className="h-4 w-4 mr-2" />
-                {t.settings.profile}
+                <User className="h-2.5 w-2.5 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{t.settings.profile}</span>
+                <span className="sm:hidden">Профил</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="notifications" 
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+                className="px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Bell className="h-4 w-4 mr-2" />
-                {t.settings.notifications}
+                <Bell className="h-2.5 w-2.5 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{t.settings.notifications}</span>
+                <span className="sm:hidden">Билд.</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="security" 
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+                className="px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Shield className="h-4 w-4 mr-2" />
-                {t.settings.security}
+                <Shield className="h-2.5 w-2.5 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{t.settings.security}</span>
+                <span className="sm:hidden">Хавфсизлик</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="appearance" 
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+                className="px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Globe className="h-4 w-4 mr-2" />
-                {t.settings.appearance}
+                <Globe className="h-2.5 w-2.5 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{t.settings.appearance}</span>
+                <span className="sm:hidden">Кўриниш</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="applications" 
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+                className="px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Mail className="h-4 w-4 mr-2" />
-                Murojatlar
+                <Mail className="h-2.5 w-2.5 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Murojatlar</span>
+                <span className="sm:hidden">Муроҳат</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="tasks" 
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
+                className="px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-colors"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                Topshiriqlar
+                <Settings className="h-2.5 w-2.5 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Topshiriqlar</span>
+                <span className="sm:hidden">Топшириқ</span>
               </TabsTrigger>
               
               {isAdmin && (
                 <TabsTrigger 
                   value="admin" 
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-emerald-600 data-[state=active]:border-emerald-600 transition-colors"
+                  className="px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 data-[state=active]:text-emerald-600 data-[state=active]:border-emerald-600 transition-colors"
                 >
-                  <Settings className="h-4 w-4 mr-2" />
-                  {t.settings.admin}
+                  <Settings className="h-2.5 w-2.5 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">{t.settings.admin}</span>
+                  <span className="sm:hidden">Админ</span>
                 </TabsTrigger>
               )}
             </TabsList>
@@ -222,12 +260,12 @@ export default function SettingsPage() {
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-16 w-16">
                     <AvatarFallback className="bg-emerald-600 text-white text-lg font-medium">
-                      AK
+                      АК
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">Abdulla Karimov</h3>
-                    <p className="text-sm text-gray-600">admin@ehokimiyat.uz</p>
+                    <h3 className="text-lg font-medium text-gray-900">{currentUser.firstName} {currentUser.lastName}</h3>
+                    <p className="text-sm text-gray-600">{currentUser.email}</p>
                   </div>
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white animate-bounce-subtle" />
                 </div>
@@ -446,12 +484,12 @@ export default function SettingsPage() {
                 <div className="rounded-lg border border-border p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium">{t.settings.pnfl}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{t.settings.pnflDesc}</p>
+                      <h4 className="font-medium">{t.settings.email}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">{t.settings.emailDesc}</p>
                     </div>
                       <code className="rounded bg-muted px-3 py-1 font-mono text-sm">
-                      ***{(currentUser.pnfl ?? "").slice(-4)}
-                    </code>
+                        {currentUser.email}
+                      </code>
                   </div>
                 </div>
 
@@ -750,8 +788,10 @@ export default function SettingsPage() {
             </TabsContent>
           )}
         </Tabs>
+        </section>
         </div>
       </div>
-    </React.Fragment>
+    </div>
+    </>
   )
 }

@@ -142,6 +142,7 @@ export const uzCyrlTranslations: Translations = {
     middleName: 'Шариф',
     phone: 'Телефон',
     email: 'Email',
+    emailDesc: 'Тизимга кириш учун сизнинг email манзилингиз',
     oneIDConnected: 'OneID уланган',
     notificationSettings: 'Билдиришнома созламалари',
     notificationDescription: 'Қабул қилиш хабарномаларини созланг',

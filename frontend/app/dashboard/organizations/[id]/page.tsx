@@ -71,7 +71,7 @@ export default function OrganizationDetailPage() {
   const overdueTasks = orgTasks.filter((t) => t.status === "MUDDATI_KECH").length
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("uz-UZ")
+    return new Date(dateStr).toLocaleDateString('en-GB')
   }
 
   if (!organization) {

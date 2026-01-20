@@ -156,60 +156,147 @@ function AuditLogContent() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Filters */}
-      <Card className="bg-card border-border">
-        <CardContent className="p-4">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative flex-1 md:max-w-sm">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Qidirish..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-secondary"
-              />
-            </div>
-            <Select value={actionFilter} onValueChange={setActionFilter}>
-              <SelectTrigger className="w-full md:w-[180px] bg-secondary">
-                <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Amal turi" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Barcha amallar</SelectItem>
-                <SelectItem value="USER">Foydalanuvchi</SelectItem>
-                <SelectItem value="TASK">Topshiriq</SelectItem>
-                <SelectItem value="ORG">Tashkilot</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={targetFilter} onValueChange={setTargetFilter}>
-              <SelectTrigger className="w-full md:w-[180px] bg-secondary">
-                <SelectValue placeholder="Ob'ekt turi" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Barcha ob'ektlar</SelectItem>
-                <SelectItem value="user">Foydalanuvchi</SelectItem>
-                <SelectItem value="task">Topshiriq</SelectItem>
-                <SelectItem value="organization">Tashkilot</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+    <>
+      <div className="min-h-screen bg-background pt-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-8 py-8">
 
-      {/* Audit Logs Table */}
-      <Card className="bg-card border-border">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-muted-foreground">Sana</TableHead>
-                <TableHead className="text-muted-foreground">Foydalanuvchi</TableHead>
-                <TableHead className="text-muted-foreground">Amal</TableHead>
-                <TableHead className="text-muted-foreground">Tafsilot</TableHead>
-                <TableHead className="text-muted-foreground">Ob'ekt</TableHead>
-              </TableRow>
-            </TableHeader>
+            {/* Header Section */}
+            <section className="animate-slide-up">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-rose-600 rounded-3xl flex items-center justify-center shadow-lg">
+                  <History className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Аудит журнали</h1>
+                  <p className="text-lg text-muted-foreground">Тизимдаги барча амалларнинг батафсил қайдлари</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Stats Cards */}
+            <section className="animate-slide-up">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                        <ClipboardList className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{extendedAuditLogs.length}</p>
+                        <p className="text-sm text-muted-foreground">Жами қайдлар</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                        <User className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{new Set(extendedAuditLogs.map(l => l.userId)).size}</p>
+                        <p className="text-sm text-muted-foreground">Фаол фойдаланувчилар</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+                        <Building2 className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">
+                          {extendedAuditLogs.filter(l => l.targetType === 'organization').length}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Ташкилот амаллари</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                        <Filter className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">
+                          {Object.keys(actionLabels).length}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Амал турлари</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+
+            {/* Filters Section */}
+            <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
+              <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
+                <CardContent className="p-6">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center flex-wrap">
+                      <div className="relative flex-1 lg:max-w-sm">
+                        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="Қайд ёки фойдаланувчи бўйича қидирув..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-12 h-12 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                        />
+                      </div>
+                      <Select value={actionFilter} onValueChange={setActionFilter}>
+                        <SelectTrigger className="w-full lg:w-[200px] h-11 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300">
+                          <Filter className="mr-2 h-4 w-4 text-muted-foreground" />
+                          <SelectValue placeholder="Амал тури" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl">
+                          <SelectItem value="all">Барча амаллар</SelectItem>
+                          <SelectItem value="USER">Фойдаланувчи амаллари</SelectItem>
+                          <SelectItem value="TASK">Топшириқ амаллари</SelectItem>
+                          <SelectItem value="ORG">Ташкилот амаллари</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={targetFilter} onValueChange={setTargetFilter}>
+                        <SelectTrigger className="w-full lg:w-[200px] h-11 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300">
+                          <SelectValue placeholder="Обект тури" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl">
+                          <SelectItem value="all">Барча обектлар</SelectItem>
+                          <SelectItem value="user">Фойдаланувчи</SelectItem>
+                          <SelectItem value="task">Топшириқ</SelectItem>
+                          <SelectItem value="organization">Ташкилот</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Audit Logs Table */}
+            <section className="animate-slide-up" style={{ animationDelay: "400ms" }}>
+              <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-border hover:bg-muted/20 transition-colors duration-300 bg-muted/10">
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Сана</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Фойдаланувчи</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Амал</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Тафсилотлар</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Обект</TableHead>
+                      </TableRow>
+                    </TableHeader>
             <TableBody>
               {filteredLogs
                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

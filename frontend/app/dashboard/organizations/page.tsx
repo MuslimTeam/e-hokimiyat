@@ -1,259 +1,317 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { sectorLabels, type Sector } from "@/lib/mock-data"
-import { getOrganizations, getUsers } from "@/lib/api"
-import {
-  Plus,
-  Search,
-  Building2,
-  Users,
-  ClipboardList,
-  TrendingUp,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  Eye,
-  Layers,
-} from "lucide-react"
-import { useState, useEffect } from "react"
-import { Progress } from "@/components/ui/progress"
-import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import Link from "next/link"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { Search, Plus, MoreHorizontal, Edit, Trash2, Building2, MapPin, Phone, Mail, Star, TrendingUp, Users } from "lucide-react"
+import { getOrganizations } from "@/lib/api"
+import { Header } from "@/components/layout/header"
+import { sectorLabels } from "@/lib/mock-data"
+
+const sectors = Object.entries(sectorLabels).map(([value, label]) => ({ value, label }))
 
 export default function OrganizationsPage() {
+  const [organizations, setOrganizations] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [sectorFilter, setSectorFilter] = useState("all")
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [sectorFilter, setSectorFilter] = useState<string>("all")
-  const [newOrgSector, setNewOrgSector] = useState<string>("")
-  const [orgs, setOrgs] = useState<any[]>([])
-  const [users, setUsers] = useState<any[]>([])
-
-  const filteredOrgs = orgs.filter((org) => {
-    const matchesSearch = org.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesSector = sectorFilter === "all" || org.sector === sectorFilter
-    return matchesSearch && matchesSector
+  const [newOrg, setNewOrg] = useState({
+    name: "",
+    sector: "",
+    region: "",
+    address: "",
+    phone: "",
+    email: "",
+    director: "",
+    contactPerson: "",
   })
 
-  const getUserCountByOrg = (orgId: string) => {
-    return users.filter((user) => user.organizationId === orgId).length
-  }
-
   useEffect(() => {
-    let mounted = true
-    Promise.all([getOrganizations(), getUsers()])
-      .then(([orgsList, usersList]) => {
-        if (!mounted) return
-        setOrgs(orgsList)
-        setUsers(usersList)
-      })
-      .catch(() => {})
-    return () => {
-      mounted = false
-    }
+    getOrganizations()
+      .then(setOrganizations)
+      .catch(console.error)
   }, [])
+
+  const handleCreateOrg = () => {
+    // In real app, this would call API
+    console.log("Creating organization:", newOrg)
+    setIsCreateOpen(false)
+    setNewOrg({
+      name: "",
+      sector: "",
+      region: "",
+      address: "",
+      phone: "",
+      email: "",
+      director: "",
+      contactPerson: "",
+    })
+  }
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
-        
-        <div className="relative z-10 p-6 space-y-8">
-          {/* Header Section */}
-          <section className="animate-slide-up">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">🏢</span>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Ташкилотлар</h2>
-                <p className="text-sm text-gray-500">Туман ташкилотлари ва уларнинг кўрсаткичлари</p>
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="relative flex-1 sm:max-w-sm">
-                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                  <Input
-                    placeholder="Ташкилот қидириш..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250"
-                  />
-                </div>
-                <Select value={sectorFilter} onValueChange={setSectorFilter}>
-                  <SelectTrigger className="w-full sm:w-[200px] bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
-                    <Layers className="mr-2 h-4 w-4 text-gray-400" />
-                    <SelectValue placeholder="Сўҳа" />
-                  </SelectTrigger>
-                  <SelectContent className="glass">
-                    <SelectItem value="all">Барча сўҳалар</SelectItem>
-                    {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
-                      <SelectItem key={sector} value={sector}>
-                        {sectorLabels[sector]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-250">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Янги ташкилот
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[400px] bg-white border border-gray-200 shadow-lg">
-                  <DialogHeader>
-                    <DialogTitle className="text-gray-900">Янги ташкилот яратиш</DialogTitle>
-                    <DialogDescription>
-                      Ташкилот маълумотларини киритинг
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Номи</Label>
-                      <Input id="name" placeholder="Ташкилот номи" className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Сўҳа</Label>
-                      <Select value={newOrgSector} onValueChange={setNewOrgSector}>
-                        <SelectTrigger className="bg-white border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-250">
-                          <SelectValue placeholder="Сўҳа танланг" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                          {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
-                            <SelectItem key={sector} value={sector}>
-                              {sectorLabels[sector]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsCreateOpen(false)} className="border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-250">
-                      Бекор қилиш
-                    </Button>
-                    <Button onClick={() => setIsCreateOpen(false)} className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-250">Яратиш</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </section>
+      <Header title="Ташкилотлар бошқаруви" description="Тумандаги барча ташкилотларнинг рўйхати, маълумотлари ва бошқаруви" />
+      <div className="min-h-screen bg-background pt-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-8 py-8">
 
-          {/* Organizations Grid */}
-          <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-slide-up" style={{ animationDelay: "200ms" }}>
-            {filteredOrgs.map((org, index) => (
-              <Card key={org.id} className="bg-white border border-gray-200 rounded-xl shadow-sm group hover:border-emerald-300 hover:shadow-md transition-all duration-250" style={{ animationDelay: `${index * 100}ms` }}>
-                <CardHeader className="relative z-10">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
-                        <Building2 className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg text-gray-900 group-hover:text-emerald-600 transition-colors duration-250">
-                          {org.name}
-                        </CardTitle>
-                        <Badge variant="outline" className="mt-1 border-gray-300 text-gray-700 bg-gray-50">
-                          {sectorLabels[org.sector as Sector]}
-                        </Badge>
-                      </div>
+            {/* Header Section */}
+            <section className="animate-slide-up">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-2xl">🏢</span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Ташкилотлар</h1>
+                  <p className="text-lg text-muted-foreground">Тумандаги барча ташкилотларнинг рўйхати ва бошқаруви</p>
+                </div>
+              </div>
+              
+              {/* Search and Filters */}
+              <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-md p-6">
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex-1 min-w-[200px]">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        placeholder="Ташкилотни қидириш..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 bg-background/50 border-border/50"
+                      />
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
-                          <MoreHorizontal className="h-4 w-4" />
+                  </div>
+                  
+                  <Select value={sectorFilter} onValueChange={setSectorFilter}>
+                    <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                      <SelectValue placeholder="Соҳа" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Барча соҳалар</SelectItem>
+                      {sectors.map((sector) => (
+                        <SelectItem key={sector.value} value={sector.value}>
+                          {sector.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white shadow-lg">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Янги ташкилот
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50 max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Янги ташкилот қўшиш</DialogTitle>
+                        <DialogDescription>
+                          Янги ташкилот маълумотларини киритинг
+                        </DialogDescription>
+                      </DialogHeader>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="name">Ташкилот номи</Label>
+                          <Input
+                            id="name"
+                            value={newOrg.name}
+                            onChange={(e) => setNewOrg({...newOrg, name: e.target.value})}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="sector">Соҳа</Label>
+                          <Select value={newOrg.sector} onValueChange={(value) => setNewOrg({...newOrg, sector: value})}>
+                            <SelectTrigger className="bg-background/50 border-border/50">
+                              <SelectValue placeholder="Соҳани танланг" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {sectors.map((sector) => (
+                                <SelectItem key={sector.value} value={sector.value}>
+                                  {sector.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="region">Туман/Шаҳар</Label>
+                          <Input
+                            id="region"
+                            value={newOrg.region}
+                            onChange={(e) => setNewOrg({...newOrg, region: e.target.value})}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="director">Директор</Label>
+                          <Input
+                            id="director"
+                            value={newOrg.director}
+                            onChange={(e) => setNewOrg({...newOrg, director: e.target.value})}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                        
+                        <div className="col-span-2">
+                          <Label htmlFor="address">Манзил</Label>
+                          <Input
+                            id="address"
+                            value={newOrg.address}
+                            onChange={(e) => setNewOrg({...newOrg, address: e.target.value})}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="phone">Телефон</Label>
+                          <Input
+                            id="phone"
+                            value={newOrg.phone}
+                            onChange={(e) => setNewOrg({...newOrg, phone: e.target.value})}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={newOrg.email}
+                            onChange={(e) => setNewOrg({...newOrg, email: e.target.value})}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                        
+                        <div className="col-span-2">
+                          <Label htmlFor="contactPerson">Масъул шахс</Label>
+                          <Input
+                            id="contactPerson"
+                            value={newOrg.contactPerson}
+                            onChange={(e) => setNewOrg({...newOrg, contactPerson: e.target.value})}
+                            className="bg-background/50 border-border/50"
+                          />
+                        </div>
+                      </div>
+                      
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+                          Бекор қилиш
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
-                        <Link href={`/dashboard/organizations/${org.id}`}>
-                          <DropdownMenuItem className="hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
-                            <Eye className="mr-2 h-4 w-4" />
-                            Кўриш
-                          </DropdownMenuItem>
-                        </Link>
-                        <DropdownMenuItem className="hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-250">
-                          <Edit className="mr-2 h-4 w-4" />
-                          Таҳрирлаш
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600 hover:bg-red-50 transition-all duration-250">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Ўчириш
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent className="relative z-10 space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1 text-2xl font-bold text-emerald-600">
-                        <TrendingUp className="h-5 w-5" />
-                        {org.completionRate}%
+                        <Button onClick={handleCreateOrg} className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">
+                          Қўшиш
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+            </section>
+
+            {/* Organizations Grid */}
+            <section className="animate-slide-up">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {organizations.map((org, index) => (
+                  <Card key={org.id} className="bg-card/80 backdrop-blur-xl border border-border shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl group">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <Building2 className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg font-semibold text-foreground group-hover:text-cyan-600 transition-colors">
+                              {org.name}
+                            </CardTitle>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="secondary" className="text-xs">
+                                {sectors.find(s => s.value === org.sector)?.label || org.sector}
+                              </Badge>
+                              {org.isActive && (
+                                <Badge className="bg-green-500 text-white text-xs">
+                                  Актив
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted/20">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-xl border-border/50">
+                            <DropdownMenuItem className="hover:bg-muted/20">
+                              <Edit className="mr-2 h-4 w-4" />
+                              Таҳрирлаш
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Ўчириш
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                      <p className="text-xs text-gray-500">Ижро</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1 text-2xl font-bold text-foreground">
-                        <ClipboardList className="h-5 w-5" />
-                        {org.totalTasks}
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="h-4 w-4" />
+                          <span>{org.region}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Phone className="h-4 w-4" />
+                          <span>{org.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Mail className="h-4 w-4" />
+                          <span>{org.email}</span>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500">Топшириқ</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1 text-2xl font-bold text-foreground">
-                        <Users className="h-5 w-5" />
-                        {getUserCountByOrg(org.id)}
+                      
+                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            {org.employeeCount || 0} ходим
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                          <span className="text-sm font-semibold text-foreground">
+                            {org.rating || 0}%
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500">Ходим</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Ижро кўрсаткичи</span>
-                      <span className="font-medium text-gray-900">{org.completionRate}%</span>
-                    </div>
-                    <Progress 
-                      value={org.completionRate} 
-                      className="h-2 bg-gray-200"
-                      style={{ 
-                        background: `linear-gradient(90deg, ${org.completionRate > 70 ? '#10b981' : org.completionRate > 40 ? '#f59e0b' : '#ef4444'} ${org.completionRate}%, #e5e7eb ${org.completionRate}%)`
-                      }}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full animate-pulse",
-                      org.isActive ? "bg-emerald-600" : "bg-gray-400"
-                    )} />
-                    <span className="text-sm text-gray-600">
-                      {org.isActive ? "Фаол" : "Фаол эмас"}
-                    </span>
-                  </div>
-                </CardContent>
-                
-              </Card>
-            ))}
-          </section>
+                      
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <span className="text-xs text-green-600 font-medium">
+                          Ижро кўрсаткичи: {org.performance || 0}%
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </>
