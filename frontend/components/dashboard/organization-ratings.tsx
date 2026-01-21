@@ -3,7 +3,6 @@
 
 import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getAnalyticsOrganizations } from "@/lib/api"
 import { Progress } from "@/components/ui/progress"
 import { Trophy, Star, TrendingUp, Building2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -13,12 +12,12 @@ export function OrganizationRatings() {
 
   React.useEffect(() => {
     let mounted = true
-    getAnalyticsOrganizations()
-      .then((list) => {
-        if (!mounted) return
-        setOrgs(list)
-      })
-      .catch(() => {})
+    // getAnalyticsOrganizations()
+    //   .then((list) => {
+    //     if (!mounted) return
+    //     setOrgs(list)
+    //   })
+    //   .catch(() => {})
     return () => {
       mounted = false
     }

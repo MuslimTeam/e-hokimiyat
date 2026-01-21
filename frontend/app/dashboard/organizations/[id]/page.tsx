@@ -104,19 +104,21 @@ export default function OrganizationDetailPage() {
                   Таҳрирлаш
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
                 <DialogHeader>
-                  <DialogTitle>Ташкилотни таҳрирлаш</DialogTitle>
-                  <DialogDescription>{"Ташкилот маълумотларини янгиланг"}</DialogDescription>
+                  <DialogTitle className="text-xl font-bold text-foreground">Ташкилотни таҳрирлаш</DialogTitle>
+                  <DialogDescription className="text-muted-foreground">
+                    Ташкилот маълумотларини янгиланг
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="space-y-2">
-                    <Label>Ташкилот номи</Label>
-                    <Input defaultValue={organization.name} />
+                    <Label className="text-sm font-medium text-foreground">Ташкилот номи</Label>
+                    <Input defaultValue={organization.name} className="bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all" />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label>Фаол ҳолат</Label>
+                      <Label className="text-sm font-medium text-foreground">Фаол ҳолат</Label>
                       <p className="text-sm text-muted-foreground">
                         Нофаол ташкилотларга топшириқ бириктириб бўлмайди
                       </p>
@@ -125,7 +127,7 @@ export default function OrganizationDetailPage() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+                  <Button variant="outline" onClick={() => setIsEditOpen(false)} className="border-border/50 bg-background/50">
                     Бекор қилиш
                   </Button>
                   <Button onClick={() => setIsEditOpen(false)}>Сақлаш</Button>
@@ -143,16 +145,16 @@ export default function OrganizationDetailPage() {
                   Ўчириш
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Ташкилотни ўчириш</AlertDialogTitle>
-                  <AlertDialogDescription>
+                  <AlertDialogTitle className="text-xl font-bold text-foreground">Ташкилотни ўчириш</AlertDialogTitle>
+                  <AlertDialogDescription className="text-muted-foreground">
                     {organization.name} ни ўчирмоқчимисиз? Бу амални ортга қайтариб бўлмайди. Ташкилотга
                     бириктирилган барча фойдаланувчилар ва топшириқлар ҳам ўчирилади.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Бекор қилиш</AlertDialogCancel>
+                  <AlertDialogCancel className="border-border/50 bg-background/50">Бекор қилиш</AlertDialogCancel>
                   <AlertDialogAction className="bg-destructive hover:bg-destructive/90">Ўчириш</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

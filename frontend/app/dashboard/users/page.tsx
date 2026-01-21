@@ -58,20 +58,35 @@ export default function UsersPage() {
 
     setNewUserStep("loading")
 
+    // First check if user already exists in our database
+    const existingUser = users.find(user => user.pnfl === newUserPnfl)
+    
+    if (existingUser) {
+      // User already exists in our system
+      setNewUserStep("not_found")
+      return
+    }
+
+    // Simulate OneID lookup - in real app this would be actual OneID API call
     setTimeout(() => {
-      // Simulate OneID lookup - random success/fail for demo
-      if (Math.random() > 0.3) {
-        // Found in OneID - pre-fill data
-        setNewUserData({
-          ...newUserData,
-          firstName: "Yangi",
-          lastName: "Foydalanuvchi",
-          middleName: "O'g'li",
-        })
-        setNewUserStep("form")
-      } else {
-        setNewUserStep("not_found")
+      // For demo purposes, we'll assume all PNFLs are valid in OneID
+      // In real app, this would be actual OneID API response
+      const mockOneIDResponse = {
+        firstName: "OneID",
+        lastName: "Foydalanuvchi", 
+        middleName: "O'g'li",
+        birthDate: "1990-01-01",
+        phone: "+998901234567"
       }
+      
+      setNewUserData({
+        ...newUserData,
+        firstName: mockOneIDResponse.firstName,
+        lastName: mockOneIDResponse.lastName,
+        middleName: mockOneIDResponse.middleName,
+        phone: mockOneIDResponse.phone,
+      })
+      setNewUserStep("form")
     }, 1500)
   }
 
@@ -91,7 +106,23 @@ export default function UsersPage() {
   }
 
   const createUser = () => {
-    // In real app, this would call API
+    // Create new user with PNFL and OneID data
+    const newUser = {
+      id: Date.now().toString(),
+      pnfl: newUserPnfl,
+      firstName: newUserData.firstName,
+      lastName: newUserData.lastName,
+      middleName: newUserData.middleName,
+      role: newUserData.role,
+      organizationId: newUserData.organizationId,
+      position: newUserData.position,
+      phone: newUserData.phone,
+      status: "FAOL",
+      createdAt: new Date().toISOString(),
+    }
+    
+    // Add to users list (in real app, this would be API call)
+    setUsers([...users, newUser])
     resetCreateDialog()
   }
 
@@ -191,15 +222,15 @@ export default function UsersPage() {
                       {newUserStep === "not_found" && (
                         <div className="space-y-4">
                           <div className="text-center py-4">
-                            <p className="text-muted-foreground">Фойдаланувчи OneID тизимида топилмади</p>
-                            <p className="text-sm text-muted-foreground mt-2">Илтимос, ПНФЛ рақамини текшириб, қайта уриниб кўринг</p>
+                            <p className="text-muted-foreground">Ушбу ПНФЛ рақами тизимда мавжуд</p>
+                            <p className="text-sm text-muted-foreground mt-2">Фойдаланувчи аллақачон рўйхатдан ўтган. Бошқа ПНФЛ рақамини киритинг.</p>
                           </div>
                           <Button 
                             onClick={() => setNewUserStep("pnfl")}
                             variant="outline"
                             className="w-full"
                           >
-                            Қайта уриниш
+                            Қайта урилиш
                           </Button>
                         </div>
                       )}

@@ -21,7 +21,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { priorityLabels, sectorLabels, type TaskPriority, type Sector } from "@/lib/mock-data"
-import { getTaskById, getTaskChat, getUsers, getOrganizations, getTaskExecutions } from "@/lib/api"
+import { getTaskById, getTaskChat, getUsers, getOrganizations } from "@/lib/api"
 import { TaskStatusBadge, PriorityBadge } from "@/components/ui/status-badge"
 import {
   ArrowLeft,
@@ -66,7 +66,7 @@ export default function TaskDetailPage() {
         if (!mounted) return
         setTask(t)
         setChatMessages(chat)
-        getTaskExecutions(t.id).then((execs) => setTaskExecutions(execs)).catch(() => setTaskExecutions([]))
+        // getTaskExecutions(t.id).then((execs) => setTaskExecutions(execs)).catch(() => setTaskExecutions([]))
         const uMap: Record<string, any> = {}
         users.forEach((u: any) => (uMap[u.id] = u))
         setUsersMap(uMap)
@@ -135,22 +135,22 @@ export default function TaskDetailPage() {
                     Muddat uzaytirish
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
                   <DialogHeader>
-                    <DialogTitle>Muddat uzaytirish so'rovi</DialogTitle>
-                    <DialogDescription>Yangi muddat va sabab kiriting</DialogDescription>
+                    <DialogTitle className="text-xl font-bold text-foreground">Muddat uzaytirish so'rovi</DialogTitle>
+                    <DialogDescription className="text-muted-foreground">Yangi muddat va sabab kiriting</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                      <Label>Yangi muddat</Label>
-                      <Input type="date" defaultValue={task.deadline} />
+                      <Label className="text-sm font-medium text-foreground">Yangi muddat</Label>
+                      <Input type="date" defaultValue={task.deadline} className="bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all" />
                       <div>
-                        <p className="font-medium">{creator ? `${creator.lastName} ${creator.firstName}` : "-"}</p>
+                        <p className="font-medium text-foreground">{creator ? `${creator.lastName} ${creator.firstName}` : "-"}</p>
                       </div>
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsExtendOpen(false)}>
+                    <Button variant="outline" onClick={() => setIsExtendOpen(false)} className="border-border/50 bg-background/50">
                       Bekor qilish
                     </Button>
                     <Button onClick={() => setIsExtendOpen(false)}>So'rov yuborish</Button>
@@ -167,14 +167,14 @@ export default function TaskDetailPage() {
                     Tahrirlash
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="sm:max-w-[600px] bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
                   <DialogHeader>
-                    <DialogTitle>Topshiriqni tahrirlash</DialogTitle>
+                    <DialogTitle className="text-xl font-bold text-foreground">Topshiriqni tahrirlash</DialogTitle>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                      <Label>Sarlavha</Label>
-                      <Input defaultValue={task.title} />
+                      <Label className="text-sm font-medium text-foreground">Sarlavha</Label>
+                      <Input defaultValue={task.title} className="bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all" />
                     </div>
                     <div className="space-y-2">
                       <Label>Tavsif</Label>

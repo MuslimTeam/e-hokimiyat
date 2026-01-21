@@ -28,7 +28,7 @@ import {
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { getAppeals, getAppealStats, getAppealOptions } from "@/lib/api"
+import { getAppeals } from "@/lib/api"
 
 export default function AppealsPage() {
   const [appeals, setAppeals] = useState<any[]>([])
@@ -52,12 +52,11 @@ export default function AppealsPage() {
 
   const loadData = async () => {
     try {
-      const [statsData, optionsData] = await Promise.all([
-        getAppealStats(),
-        getAppealOptions()
-      ])
-      setStats(statsData)
-      setOptions(optionsData)
+      // Mock stats and options data
+      const mockStats = { total: 0, pending: 0, inProgress: 0, resolved: 0 }
+      const mockOptions = { status: {}, priority: {}, category: {}, districts: [] }
+      setStats(mockStats)
+      setOptions(mockOptions)
     } catch (error) {
       console.error('Failed to load data:', error)
     } finally {
@@ -67,14 +66,8 @@ export default function AppealsPage() {
 
   const loadAppeals = async () => {
     try {
-      const data = await getAppeals({
-        search: searchQuery,
-        status: statusFilter,
-        category: categoryFilter,
-        priority: priorityFilter,
-        district: districtFilter
-      })
-      setAppeals(data.data || [])
+      const data = await getAppeals()
+      setAppeals(data || [])
     } catch (error) {
       console.error('Failed to load appeals:', error)
     }
@@ -178,7 +171,7 @@ export default function AppealsPage() {
 
           {/* Filters */}
           <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
-            <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-md p-6">
+            <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-md p-6">
               <div className="flex flex-wrap gap-4">
                 <div className="flex-1 min-w-[200px]">
                   <div className="relative">
@@ -187,16 +180,16 @@ export default function AppealsPage() {
                       placeholder="Мурожаатни қидириш..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-background/50 border-border/50"
+                      className="pl-10 bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all"
                     />
                   </div>
                 </div>
                 
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
                     <SelectValue placeholder="Ҳолат" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
                     <SelectItem value="all">Барча ҳолатлар</SelectItem>
                     {Object.entries(options.status || {}).map(([value, label]) => (
                       <SelectItem key={value} value={value}>{String(label)}</SelectItem>
@@ -205,10 +198,10 @@ export default function AppealsPage() {
                 </Select>
                 
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
                     <SelectValue placeholder="Туркум" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
                     <SelectItem value="all">Барча туркумлар</SelectItem>
                     {Object.entries(options.category || {}).map(([value, label]) => (
                       <SelectItem key={value} value={value}>{String(label)}</SelectItem>
@@ -217,10 +210,10 @@ export default function AppealsPage() {
                 </Select>
                 
                 <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
                     <SelectValue placeholder="Устуворлик" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
                     <SelectItem value="all">Барча устуворликлар</SelectItem>
                     {Object.entries(options.priority || {}).map(([value, label]) => (
                       <SelectItem key={value} value={value}>{String(label)}</SelectItem>
@@ -229,10 +222,10 @@ export default function AppealsPage() {
                 </Select>
                 
                 <Select value={districtFilter} onValueChange={setDistrictFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50">
+                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
                     <SelectValue placeholder="Туман" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
                     <SelectItem value="all">Барча туманлар</SelectItem>
                     {(options.districts || []).map((district: any) => (
                       <SelectItem key={district.id} value={district.id}>{district.name}</SelectItem>
@@ -328,10 +321,10 @@ export default function AppealsPage() {
           {/* Appeal Detail Modal */}
           {selectedAppeal && (
             <Dialog open={!!selectedAppeal} onOpenChange={() => setSelectedAppeal(null)}>
-              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto glass">
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
                 <DialogHeader>
-                  <DialogTitle className="text-xl font-bold">{selectedAppeal.title}</DialogTitle>
-                  <DialogDescription>
+                  <DialogTitle className="text-xl font-bold text-foreground">{selectedAppeal.title}</DialogTitle>
+                  <DialogDescription className="text-muted-foreground">
                     Мурожаат тафсилотлари
                   </DialogDescription>
                 </DialogHeader>
@@ -341,21 +334,21 @@ export default function AppealsPage() {
                   <div className="space-y-3">
                     <h4 className="font-semibold text-foreground">Аризачи маълумотлари</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
+                      <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">ФИО</p>
-                        <p className="font-medium">{selectedAppeal.applicant}</p>
+                        <p className="font-medium text-foreground">{selectedAppeal.applicant}</p>
                       </div>
-                      <div>
+                      <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Телефон</p>
-                        <p className="font-medium">{selectedAppeal.phone}</p>
+                        <p className="font-medium text-foreground">{selectedAppeal.phone}</p>
                       </div>
-                      <div>
+                      <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Email</p>
-                        <p className="font-medium">{selectedAppeal.email}</p>
+                        <p className="font-medium text-foreground">{selectedAppeal.email}</p>
                       </div>
-                      <div>
+                      <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Туман</p>
-                        <p className="font-medium">{(options.districts || []).find(d => d.id === selectedAppeal.district)?.name}</p>
+                        <p className="font-medium text-foreground">{(options.districts || []).find(d => d.id === selectedAppeal.district)?.name}</p>
                       </div>
                     </div>
                   </div>
@@ -363,7 +356,7 @@ export default function AppealsPage() {
                   {/* Appeal Content */}
                   <div className="space-y-3">
                     <h4 className="font-semibold text-foreground">Мурожаат матни</h4>
-                    <p className="text-sm leading-relaxed bg-muted/50 p-4 rounded-lg">
+                    <p className="text-sm leading-relaxed bg-muted/50 p-4 rounded-lg border border-border/50">
                       {selectedAppeal.content}
                     </p>
                   </div>
@@ -372,13 +365,13 @@ export default function AppealsPage() {
                   <div className="space-y-3">
                     <h4 className="font-semibold text-foreground">Мурожаат тафсилотлари</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
+                      <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Туркум</p>
-                        <Badge variant="outline" className="border-white/20">
+                        <Badge variant="outline" className="border-border/50 bg-background/50">
                           {String(options.category[selectedAppeal.category])}
                         </Badge>
                       </div>
-                      <div>
+                      <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Ҳолат</p>
                         <Badge className={cn("border", statusColors[selectedAppeal.status])}>
                           <div className="flex items-center gap-1">
@@ -387,7 +380,7 @@ export default function AppealsPage() {
                           </div>
                         </Badge>
                       </div>
-                      <div>
+                      <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Устуворлик</p>
                         <Badge className={cn("border", priorityColors[selectedAppeal.priority])}>
                           {String(options.priority[selectedAppeal.priority])}
