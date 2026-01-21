@@ -87,30 +87,32 @@ export default function OrganizationDetailPage() {
     <>
       <Header title="Ташкилот маълумотлари" />
       <div className="p-6 space-y-6">
-        {/* Back button and actions */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/dashboard/organizations">
-            <Button variant="ghost" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Орқага
-            </Button>
-          </Link>
-
-          <div className="flex flex-wrap gap-2">
-            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Таҳрирлаш
+        {/* Header with title and actions */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex items-center justify-between w-full">
+            <h1 className="text-2xl font-bold text-foreground">{organization.name}</h1>
+            
+            <div className="flex gap-2">
+              <Link href="/dashboard/organizations">
+                <Button variant="ghost" className="gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Орқага
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-bold text-foreground">Ташкилотни таҳрирлаш</DialogTitle>
-                  <DialogDescription className="text-muted-foreground">
-                    Ташкилот маълумотларини янгиланг
-                  </DialogDescription>
-                </DialogHeader>
+              </Link>
+              <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Таҳрирлаш
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold text-foreground">Ташкилотни таҳрирлаш</DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
+                      Ташкилот маълумотларини янгиланг
+                    </DialogDescription>
+                  </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-foreground">Ташкилот номи</Label>
@@ -134,31 +136,31 @@ export default function OrganizationDetailPage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="text-destructive border-destructive/30 hover:bg-destructive/10 bg-transparent"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Ўчириш
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-xl font-bold text-foreground">Ташкилотни ўчириш</AlertDialogTitle>
-                  <AlertDialogDescription className="text-muted-foreground">
-                    {organization.name} ни ўчирмоқчимисиз? Бу амални ортга қайтариб бўлмайди. Ташкилотга
-                    бириктирилган барча фойдаланувчилар ва топшириқлар ҳам ўчирилади.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="border-border/50 bg-background/50">Бекор қилиш</AlertDialogCancel>
-                  <AlertDialogAction className="bg-destructive hover:bg-destructive/90">Ўчириш</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="text-destructive border-destructive/30 hover:bg-destructive/10 bg-transparent"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Ўчириш
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-xl font-bold text-foreground">Ташкилотни ўчириш</AlertDialogTitle>
+                    <AlertDialogDescription className="text-muted-foreground">
+                      {organization.name} ни ўчирмоқчимисиз? Бу амални ортга қайтариб бўлмайди. Ташкилотга
+                      бириктирилган барча фойдаланувчилар ва топшириқлар ҳам ўчирилади.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="border-border/50 bg-background/50">Бекор қилиш</AlertDialogCancel>
+                    <AlertDialogAction className="bg-destructive hover:bg-destructive/90">Ўчириш</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         </div>
 

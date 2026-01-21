@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uz" suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased" style={{ fontFamily: 'var(--font-family)' }}>
+      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <a
             href="#main-content"

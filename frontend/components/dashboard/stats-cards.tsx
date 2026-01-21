@@ -31,70 +31,15 @@ export function StatsCards() {
   React.useEffect(() => {
     let mounted = true
     setIsLoading(true)
-    
-    // Use demo data instead of API call
-    const demoTasks = [
-      {
-        id: "1",
-        title: "Иш сўрови ҳақида",
-        description: "Мен туман ҳокимлигидан иш сўравини олмоқчиман. Керакли ҳужжатлар рўйхати қайердан олиш мумкин?",
-        status: "BAJARILDI",
-        priority: "HIGH",
-        createdBy: "1",
-        createdAt: "2024-01-18T10:00:00Z",
-        deadline: "2024-01-25T18:00:00Z",
-        organizations: ["1"]
-      },
-      {
-        id: "2", 
-        title: "Таълим сифати тўғрисида",
-        description: "Мактабда таълим сифати пасаётган борми? Бу ҳақда қандай чора кўрилади?",
-        status: "IJRODA",
-        priority: "MEDIUM",
-        createdBy: "1",
-        createdAt: "2024-01-17T14:00:00Z",
-        deadline: "2024-01-30T18:00:00Z",
-        organizations: ["1"]
-      },
-      {
-        id: "3",
-        title: "Ҳудудий йиғимлар тўғрисида",
-        description: "Туман марказидаги йўлларни тозалаш ва ободон қилиш ишлари тўғрисида кўрилганлигини текшириш керак.",
-        status: "MUDDATI_KECH",
-        priority: "HIGH",
-        createdBy: "1",
-        createdAt: "2024-01-15T09:00:00Z",
-        deadline: "2024-01-20T18:00:00Z",
-        organizations: ["1"]
-      },
-      {
-        id: "4",
-        title: "Сув таъминоти муаммоси",
-        description: "Бизнинг уйда сув 2 кундан бери келмаяпти. Илтимос муаммосини кўриб чиқинг.",
-        status: "IJRODA",
-        priority: "MEDIUM",
-        createdBy: "2",
-        createdAt: "2024-01-16T08:45:00Z",
-        deadline: "2024-01-23T18:00:00Z",
-        organizations: ["2"]
-      },
-      {
-        id: "5",
-        title: "Ижтимоий йўлаклар",
-        description: "Кўча бўйда ижтимоий йўлаклар кўп бошқан. Илтимос тез кўриб чиқинг.",
-        status: "IJRODA",
-        priority: "MEDIUM",
-        createdBy: "3",
-        createdAt: "2024-01-14T11:30:00Z",
-        deadline: "2024-01-28T18:00:00Z",
-        organizations: ["3"]
-      }
-    ]
-    
-    if (mounted) {
-      setStatsData(computeStats(demoTasks))
-      setIsLoading(false)
-    }
+    getTasks()
+      .then((tasks) => {
+        if (!mounted) return
+        setStatsData(computeStats(tasks))
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (mounted) setIsLoading(false)
+      })
     return () => {
       mounted = false
     }

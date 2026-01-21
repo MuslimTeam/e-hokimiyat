@@ -1,0 +1,289 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { sectorLabels, type Sector } from "@/lib/mock-data"
+import { getOrganizations, getUsers } from "@/lib/api"
+import {
+  Plus,
+  Search,
+  Building2,
+  Users,
+  ClipboardList,
+  TrendingUp,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Eye,
+  Layers,
+} from "lucide-react"
+import { useState, useEffect } from "react"
+import { Progress } from "@/components/ui/progress"
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import Link from "next/link"
+
+export default function OrganizationsPage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [sectorFilter, setSectorFilter] = useState<string>("all")
+  const [newOrgSector, setNewOrgSector] = useState<string>("")
+  const [orgs, setOrgs] = useState<any[]>([])
+  const [users, setUsers] = useState<any[]>([])
+
+  const filteredOrgs = orgs.filter((org) => {
+    const matchesSearch = org.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSector = sectorFilter === "all" || org.sector === sectorFilter
+    return matchesSearch && matchesSector
+  })
+
+  useEffect(() => {
+    let mounted = true
+    Promise.all([getOrganizations(), getUsers()])
+      .then(([orgsList, usersList]) => {
+        if (!mounted) return
+        setOrgs(orgsList)
+        setUsers(usersList)
+      })
+      .catch(() => {})
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const getUserCountByOrg = (orgId: string) => {
+    return users.filter((user) => user.organizationId === orgId).length
+  }
+
+  return (
+    <div>
+      <div className="min-h-screen bg-background pt-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-8 py-8">
+
+            {/* Header Section */}
+            <section className="animate-slide-up">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 bg-linear-to-br from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-2xl">🏢</span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Ташкилотлар бошқаруви</h1>
+                  <p className="text-lg text-muted-foreground">Туман ташкилотларининг рўйхати ва бошқаруви</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Stats Cards */}
+            <section className="animate-slide-up">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                        <Building2 className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{orgs.length}</p>
+                        <p className="text-sm text-muted-foreground">Жами ташкилотлар</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                        <Users className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{users.filter(u => u.organizationId).length}</p>
+                        <p className="text-sm text-muted-foreground">Фаол ходимлар</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                        <ClipboardList className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{orgs.reduce((sum, org) => sum + (org.tasksCount || 0), 0)}</p>
+                        <p className="text-sm text-muted-foreground">Жами топшириқлар</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+                        <TrendingUp className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">
+                          {orgs.length > 0 ? Math.round(orgs.reduce((sum, org) => sum + (org.rating || 0), 0) / orgs.length) : 0}%
+                        </p>
+                        <p className="text-sm text-muted-foreground">Ўртача рейтинг</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+
+            {/* Filters and Actions */}
+            <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
+              <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
+                <CardContent className="p-6">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center flex-wrap">
+                      <div className="relative flex-1 lg:max-w-sm">
+                        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="Ташкилот номи бўйича қидирув..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-12 h-12 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                        />
+                      </div>
+                      <Select value={sectorFilter} onValueChange={setSectorFilter}>
+                        <SelectTrigger className="w-full lg:w-[200px] h-11 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300">
+                          <Layers className="mr-2 h-4 w-4 text-muted-foreground" />
+                          <SelectValue placeholder="Сўҳа" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl">
+                          <SelectItem value="all">Барча сўҳалар</SelectItem>
+                          {(Object.keys(sectorLabels) as Sector[]).map((sector) => (
+                            <SelectItem key={sector} value={sector}>
+                              {sectorLabels[sector]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground h-12 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-semibold">
+                        <Plus className="mr-2 h-5 w-5" />
+                        Янги ташкилот қўшиш
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
+                </CardContent>
+                </Card>
+              </Card>
+            </section>
+
+            {/* Organizations Table */}
+            <section className="animate-slide-up" style={{ animationDelay: "400ms" }}>
+              <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-border hover:bg-muted/20 transition-colors duration-300 bg-muted/10">
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Ташкилот номи</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Сўҳа</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Ходимлар</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Топшириқлар</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Рейтинг</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4 w-[70px]">Амаллар</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredOrgs.map((org, index) => (
+                        <TableRow key={org.id} className="border-border hover:bg-muted/10 transition-colors duration-300">
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-linear-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+                                <Building2 className="w-5 h-5 text-primary" />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-foreground">{org.name}</p>
+                                <p className="text-sm text-muted-foreground">{org.description}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <Badge variant="outline" className="font-normal border-border/50 text-foreground bg-muted/20">
+                              {sectorLabels[org.sector]}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-medium">{users.filter((user) => user.organizationId === org.id).length}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <ClipboardList className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-medium">{org.tasksCount || 0}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 bg-linear-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                                <span className="text-white font-bold text-xs">★</span>
+                              </div>
+                              <span className="font-medium">{org.rating || 0}%</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-muted/20 hover:text-primary transition-all duration-300 rounded-lg">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl">
+                                <Link href={`/dashboard/organizations/${org.id}`}>
+                                  <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-lg">
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Батафсил кўриш
+                                  </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-lg">
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Таҳрирлаш
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive hover:bg-destructive/10 transition-all duration-300 rounded-lg">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Ўчириш
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

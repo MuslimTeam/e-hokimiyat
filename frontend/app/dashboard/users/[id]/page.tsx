@@ -18,6 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -211,16 +212,21 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
       <div className="min-h-screen bg-background pt-16 sm:pt-20 lg:pt-24">
         <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="space-y-4 sm:space-y-6 py-4 sm:py-6">
-        {/* Back button and actions */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/dashboard/users">
-            <Button variant="ghost" className="gap-2 h-10 px-3 sm:px-4">
-              <ArrowLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-              <span className="text-sm sm:text-base">Orqaga</span>
-            </Button>
-          </Link>
-
-          <div className="flex flex-wrap gap-2">
+        {/* Header with title and actions */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex items-center justify-between w-full">
+            <h1 className="text-2xl font-bold text-foreground">{user.firstName} {user.lastName}</h1>
+            
+            <div className="flex gap-2">
+              <Link href="/dashboard/users">
+                <Button variant="ghost" className="gap-2 h-10 px-3 sm:px-4">
+                  <ArrowLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  <span className="text-sm sm:text-base">Orqaga</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className="h-9 px-3 sm:px-4 text-xs sm:text-sm">
@@ -360,8 +366,6 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
             )}
           </div>
         </div>
-          </div>
-        </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* User Info Card */}
@@ -435,8 +439,8 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
                     <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Qo'shilgan sana</p>
-                    <p className="font-medium">{formatDate(user.createdAt)}</p>
+                    <p className="text-muted-foreground">Qo'shilgan sana</p>,
+                    <p className="font-medium">{formatDate(user.createdAt)}</p>,
                   </div>
                 </div>
 

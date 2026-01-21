@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -18,7 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { priorityLabels, sectorLabels, type TaskPriority, type Sector } from "@/lib/mock-data"
 import { getTaskById, getTaskChat, getUsers, getOrganizations } from "@/lib/api"
@@ -117,24 +117,26 @@ export default function TaskDetailPage() {
     <>
       <Header title="Topshiriq tafsilotlari" />
       <div className="p-6 space-y-6">
-        {/* Back button and actions */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/dashboard/tasks">
-            <Button variant="ghost" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Orqaga
-            </Button>
-          </Link>
-
-          <div className="flex flex-wrap gap-2">
-            {canExtend && (
-              <Dialog open={isExtendOpen} onOpenChange={setIsExtendOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Clock className="mr-2 h-4 w-4" />
-                    Muddat uzaytirish
-                  </Button>
-                </DialogTrigger>
+        {/* Header with title and actions */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex items-center justify-between w-full">
+            <h1 className="text-2xl font-bold text-foreground">Topshiriq tafsilotlari</h1>
+            
+            <div className="flex gap-2">
+              <Link href="/dashboard/tasks">
+                <Button variant="ghost" className="gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Orqaga
+                </Button>
+              </Link>
+              {canExtend && (
+                <Dialog open={isExtendOpen} onOpenChange={setIsExtendOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Clock className="mr-2 h-4 w-4" />
+                      Muddat uzaytirish
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold text-foreground">Muddat uzaytirish so'rovi</DialogTitle>
@@ -144,9 +146,10 @@ export default function TaskDetailPage() {
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-foreground">Yangi muddat</Label>
                       <Input type="date" defaultValue={task.deadline} className="bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all" />
-                      <div>
-                        <p className="font-medium text-foreground">{creator ? `${creator.lastName} ${creator.firstName}` : "-"}</p>
-                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-foreground">Sabab</Label>
+                      <Textarea placeholder="Sababni kiriting..." className="bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all" />
                     </div>
                   </div>
                   <DialogFooter>
@@ -158,7 +161,6 @@ export default function TaskDetailPage() {
                 </DialogContent>
               </Dialog>
             )}
-
             {canEdit && (
               <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogTrigger asChild>
@@ -523,6 +525,7 @@ export default function TaskDetailPage() {
                 </CardContent>
               </Card>
             )}
+          </div>
           </div>
         </div>
       </div>

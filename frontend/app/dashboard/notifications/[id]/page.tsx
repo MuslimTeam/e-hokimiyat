@@ -105,7 +105,7 @@ export default function NotificationDetailPage() {
     return (
       <>
         <Header title="Билдиришнома" description="Билдиришнома тafsilotи" />
-        <div className="min-h-screen bg-background pt-24">
+        <div className="min-h-screen bg-background pt-8">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -122,17 +122,19 @@ export default function NotificationDetailPage() {
   return (
     <>
       <Header title="Билдиришнома тafsilotи" description={notification.title} />
-      <div className="min-h-screen bg-background pt-24">
+      <div className="min-h-screen bg-background pt-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-8 py-8">
             {/* Back Button */}
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard/notifications">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Оркага қайтиш
-                </Button>
-              </Link>
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="flex items-center justify-between w-full">
+                <Link href="/dashboard/notifications">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Оркага қайтиш
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             {/* Notification Details */}

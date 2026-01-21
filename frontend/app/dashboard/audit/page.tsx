@@ -1,135 +1,152 @@
 "use client"
 
-import { useState, useEffect, useMemo, Suspense } from "react"
+import { Suspense } from "react"
 import { Header } from "@/components/layout/header"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { 
-  History, 
-  Search, 
-  Filter, 
-  User, 
-  Building2, 
-  ClipboardList, 
-  Plus, 
-  Edit, 
-  Trash2,
-  Activity
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+import { getUsers, getAuditLogs } from "@/lib/api"
+import React from "react"
+import { Search, Filter, History, User, ClipboardList, Building2 } from "lucide-react"
+import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
-// Mock data
-const auditLogs = [
+const extendedAuditLogs = [
   {
-    id: 1,
-    userId: "user1",
-    userName: "Admin User",
-    userAvatar: "",
-    action: "create",
-    targetType: "user",
-    targetName: "John Doe",
-    details: "Created new user account",
-    timestamp: "2024-01-20T10:30:00Z"
+    id: "1",
+    userId: "1",
+    action: "USER_CREATED",
+    details: "Tashkilot rahbari qo'shildi",
+    targetType: "user" as const,
+    targetId: "5",
+    createdAt: "2026-01-16T14:00:00",
   },
   {
-    id: 2,
-    userId: "user2",
-    userName: "Manager",
-    userAvatar: "",
-    action: "update",
-    targetType: "task",
-    targetName: "Website Development",
-    details: "Updated task priority to high",
-    timestamp: "2024-01-20T11:15:00Z"
+    id: "2",
+    userId: "1",
+    action: "TASK_CREATED",
+    details: "Yangi topshiriq yaratildi",
+    targetType: "task" as const,
+    targetId: "5",
+    createdAt: "2026-01-17T08:00:00",
   },
   {
-    id: 3,
-    userId: "user1",
-    userName: "Admin User",
-    userAvatar: "",
-    action: "delete",
-    targetType: "organization",
-    targetName: "Old Company",
-    details: "Deleted organization record",
-    timestamp: "2024-01-20T12:00:00Z"
-  }
+    id: "3",
+    userId: "1",
+    action: "TASK_CLOSED",
+    details: "Topshiriq nazoratdan yechildi",
+    targetType: "task" as const,
+    targetId: "2",
+    createdAt: "2026-01-25T10:00:00",
+  },
+  {
+    id: "4",
+    userId: "1",
+    action: "USER_BLOCKED",
+    details: "Foydalanuvchi bloklandi: Bekzod Mamatov",
+    targetType: "user" as const,
+    targetId: "6",
+    createdAt: "2026-01-14T11:30:00",
+  },
+  {
+    id: "5",
+    userId: "2",
+    action: "TASK_EXTENDED",
+    details: "Topshiriq muddati uzaytirildi: 7 kun",
+    targetType: "task" as const,
+    targetId: "3",
+    createdAt: "2026-01-13T14:00:00",
+  },
+  {
+    id: "6",
+    userId: "1",
+    action: "ORG_CREATED",
+    details: "Yangi tashkilot yaratildi: Ekologiya bo'limi",
+    targetType: "organization" as const,
+    targetId: "6",
+    createdAt: "2026-01-10T09:00:00",
+  },
+  {
+    id: "7",
+    userId: "3",
+    action: "TASK_REPORT",
+    details: "Hisobot topshirildi: Yo'l ta'mirlash ishlari",
+    targetType: "task" as const,
+    targetId: "1",
+    createdAt: "2026-01-16T15:45:00",
+  },
+  {
+    id: "8",
+    userId: "1",
+    action: "USER_ROLE_CHANGED",
+    details: "Rol o'zgartirildi: Tashkilot mas'uli → Tashkilot rahbari",
+    targetType: "user" as const,
+    targetId: "4",
+    createdAt: "2026-01-12T10:20:00",
+  },
 ]
 
-const actionLabels = {
-  create: "Yaratish",
-  update: "Yangilash",
-  delete: "O'chirish"
+const actionLabels: Record<string, string> = {
+  USER_CREATED: "Foydalanuvchi qo'shildi",
+  USER_BLOCKED: "Foydalanuvchi bloklandi",
+  USER_ARCHIVED: "Foydalanuvchi arxivlandi",
+  USER_ROLE_CHANGED: "Rol o'zgartirildi",
+  TASK_CREATED: "Topshiriq yaratildi",
+  TASK_CLOSED: "Nazoratdan yechildi",
+  TASK_EXTENDED: "Muddat uzaytirildi",
+  TASK_REPORT: "Hisobot topshirildi",
+  TASK_REASSIGNED: "Qayta ijroga yuborildi",
+  ORG_CREATED: "Tashkilot yaratildi",
+  ORG_UPDATED: "Tashkilot yangilandi",
+  ORG_DELETED: "Tashkilot o'chirildi",
 }
 
-const targetLabels = {
-  user: "Foydalanuvchi",
-  task: "Topshiriq",
-  organization: "Tashkilot"
+const targetTypeIcons = {
+  user: User,
+  task: ClipboardList,
+  organization: Building2,
 }
+
+const targetTypeColors = {
+  user: "bg-blue-500/10 text-blue-500 border-blue-500/30",
+  task: "bg-yellow-500/10 text-yellow-500 border-yellow-500/30",
+  organization: "bg-purple-500/10 text-purple-500 border-purple-500/30",
+}
+
 
 function AuditLogContent() {
+  const [actionFilter, setActionFilter] = useState<string>("all")
+  const [targetFilter, setTargetFilter] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const [actionFilter, setActionFilter] = useState("all")
-  const [targetFilter, setTargetFilter] = useState("all")
+  const [logs, setLogs] = useState<any[]>(extendedAuditLogs)
+  const [usersMap, setUsersMap] = useState<Record<string, any>>({})
 
-  const filteredLogs = useMemo(() => {
-    return auditLogs.filter((log) => {
-      const matchesSearch = searchQuery === "" || 
-        log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.details.toLowerCase().includes(searchQuery.toLowerCase())
-      
-      const matchesAction = actionFilter === "all" || log.action === actionFilter
-      const matchesTarget = targetFilter === "all" || log.targetType === targetFilter
-      
-      return matchesSearch && matchesAction && matchesTarget
-    })
-  }, [searchQuery, actionFilter, targetFilter])
-
-  const getActionColor = (action: string) => {
-    switch (action) {
-      case "create":
-        return "bg-green-500/20 text-green-600 border-green-500/30"
-      case "update":
-        return "bg-amber-500/20 text-amber-600 border-amber-500/30"
-      case "delete":
-        return "bg-red-500/20 text-red-600 border-red-500/30"
-      default:
-        return "bg-gray-500/20 text-gray-600 border-gray-500/30"
+  React.useEffect(() => {
+    let mounted = true
+    Promise.all([getAuditLogs(), getUsers()])
+      .then(([fetchedLogs, users]) => {
+        if (!mounted) return
+        setLogs((prev) => [...extendedAuditLogs, ...(fetchedLogs?.logs || [])])
+        const map: Record<string, any> = {}
+        users.forEach((u: any) => (map[u.id] = u))
+        setUsersMap(map)
+      })
+      .catch(() => {})
+    return () => {
+      mounted = false
     }
-  }
+  }, [])
 
-  const getActionIcon = (action: string) => {
-    switch (action) {
-      case "create":
-        return <Plus className="h-3 w-3" />
-      case "update":
-        return <Edit className="h-3 w-3" />
-      case "delete":
-        return <Trash2 className="h-3 w-3" />
-      default:
-        return <Activity className="h-3 w-3" />
-    }
-  }
+  const filteredLogs = logs.filter((log) => {
+    const matchesAction = actionFilter === "all" || log.action.startsWith(actionFilter)
+    const matchesTarget = targetFilter === "all" || log.targetType === targetFilter
+    const matchesSearch = log.details.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesAction && matchesTarget && matchesSearch
+  })
 
-  const getTargetIcon = (targetType: string) => {
-    switch (targetType) {
-      case "user":
-        return <User className="h-4 w-4 text-muted-foreground" />
-      case "task":
-        return <ClipboardList className="h-4 w-4 text-muted-foreground" />
-      case "organization":
-        return <Building2 className="h-4 w-4 text-muted-foreground" />
-      default:
-        return <Activity className="h-4 w-4 text-muted-foreground" />
-    }
-  }
-
-  const formatDate = (dateStr: string) => {
+  const formatDateTime = (dateStr: string) => {
     const date = new Date(dateStr)
     const day = date.getDate().toString().padStart(2, '0')
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
@@ -140,191 +157,206 @@ function AuditLogContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="space-y-8 py-8">
+    <>
+      <Header title="Аудит журнали" description="Тизимдаги барча амалларнинг батафсил қайдлари" />
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-12 py-8">
 
-          {/* Header Section */}
-          <section className="animate-slide-up">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-rose-600 rounded-3xl flex items-center justify-center shadow-lg">
-                <History className="w-8 h-8 text-white" />
+            {/* Stats Cards */}
+            <section className="animate-slide-up">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                        <ClipboardList className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{logs.length}</p>
+                        <p className="text-sm text-muted-foreground">Жами қайдлар</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                        <User className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{new Set(logs.map(l => l.userId)).size}</p>
+                        <p className="text-sm text-muted-foreground">Фаол фойдаланувчилар</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+                        <Building2 className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">
+                          {logs.filter(l => l.targetType === 'organization').length}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Ташкилот амаллари</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                        <Filter className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">
+                          {Object.keys(actionLabels).length}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Амал турлари</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Аудит журнали</h1>
-                <p className="text-lg text-muted-foreground">Тизимдаги барча амалларнинг батафсил қайдлари</p>
-              </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Stats Cards */}
-          <section className="animate-slide-up">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card className="bg-card/80 backdrop-blur-xl border border-border/50 shadow-md">
+            {/* Filters Section */}
+            <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
+              <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                      <ClipboardList className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-foreground">{auditLogs.length}</p>
-                      <p className="text-sm text-muted-foreground">Жами қайдлар</p>
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center flex-wrap">
+                      <div className="relative flex-1 lg:max-w-sm">
+                        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="Қайд ёки фойдаланувчи бўйича қидирув..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-12 h-12 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                        />
+                      </div>
+                      <Select value={actionFilter} onValueChange={setActionFilter}>
+                        <SelectTrigger className="w-full lg:w-[200px] h-11 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300">
+                          <Filter className="mr-2 h-4 w-4 text-muted-foreground" />
+                          <SelectValue placeholder="Амал тури" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl">
+                          <SelectItem value="all">Барча амаллар</SelectItem>
+                          <SelectItem value="USER">Фойдаланувчи амаллари</SelectItem>
+                          <SelectItem value="TASK">Топшириқ амаллари</SelectItem>
+                          <SelectItem value="ORG">Ташкилот амаллари</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={targetFilter} onValueChange={setTargetFilter}>
+                        <SelectTrigger className="w-full lg:w-[200px] h-11 bg-background/50 border-2 border-border/50 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300">
+                          <SelectValue placeholder="Обект тури" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl">
+                          <SelectItem value="all">Барча обектлар</SelectItem>
+                          <SelectItem value="user">Фойдаланувчи</SelectItem>
+                          <SelectItem value="task">Топшириқ</SelectItem>
+                          <SelectItem value="organization">Ташкилот</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+            </section>
 
-              <Card className="bg-card/80 backdrop-blur-xl border border-border/50 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                      <User className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-foreground">{new Set(auditLogs.map(l => l.userId)).size}</p>
-                      <p className="text-sm text-muted-foreground">Фаол фойдаланувчилар</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card/80 backdrop-blur-xl border border-border/50 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
-                      <Building2 className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-foreground">
-                        {auditLogs.filter(l => l.targetType === 'organization').length}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Ташкилот амаллари</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card/80 backdrop-blur-xl border border-border/50 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                      <Filter className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-foreground">
-                        {Object.keys(actionLabels).length}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Амал турлари</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* Filters Section */}
-          <section className="animate-slide-up">
-            <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-md p-6">
-              <div className="flex flex-wrap gap-4">
-                <div className="relative flex-1 min-w-[200px]">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    placeholder="Қайд ёки фойдаланувчи бўйича қидирув..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all"
-                  />
-                </div>
-
-                <Select value={actionFilter} onValueChange={setActionFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
-                    <SelectValue placeholder="Амал тури" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                    <SelectItem value="all">Барча амаллар</SelectItem>
-                    <SelectItem value="create">Яратиш</SelectItem>
-                    <SelectItem value="update">Янгилаш</SelectItem>
-                    <SelectItem value="delete">Ўчириш</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={targetFilter} onValueChange={setTargetFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
-                    <SelectValue placeholder="Объект тури" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                    <SelectItem value="all">Барча объектлар</SelectItem>
-                    <SelectItem value="user">Фойдаланувчи</SelectItem>
-                    <SelectItem value="task">Топшириқ</SelectItem>
-                    <SelectItem value="organization">Ташкилот</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </section>
-
-          {/* Audit Logs Table */}
-          <section className="animate-slide-up">
-            <Card className="bg-card/80 backdrop-blur-xl border border-border/50 shadow-md">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-border/50">
-                      <TableHead className="text-muted-foreground">Сана</TableHead>
-                      <TableHead className="text-muted-foreground">Фойдаланувчи</TableHead>
-                      <TableHead className="text-muted-foreground">Амал</TableHead>
-                      <TableHead className="text-muted-foreground">Объект</TableHead>
-                      <TableHead className="text-muted-foreground">Тафсилотлар</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredLogs.map((log) => (
-                      <TableRow key={log.id} className="border-border/50 hover:bg-muted/20 transition-colors">
-                        <TableCell className="font-medium">{formatDate(log.timestamp)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={log.userAvatar} />
-                              <AvatarFallback>{log.userName.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
-                            </Avatar>
-                            <span>{log.userName}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={cn("border", getActionColor(log.action))}>
-                            <div className="flex items-center gap-1">
-                              {getActionIcon(log.action)}
-                              {actionLabels[log.action as keyof typeof actionLabels]}
-                            </div>
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getTargetIcon(log.targetType)}
-                            {targetLabels[log.targetType as keyof typeof targetLabels]}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{log.details}</TableCell>
+            {/* Audit Logs Table */}
+            <section className="animate-slide-up" style={{ animationDelay: "400ms" }}>
+              <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-border hover:bg-muted/20 transition-colors duration-300 bg-muted/10">
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Сана</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Фойдаланувчи</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Амал</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Тафсилотлар</TableHead>
+                        <TableHead className="text-foreground font-semibold px-6 py-4">Обект</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </section>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredLogs.slice(0, 50).map((log, index) => {
+                        const user = usersMap[log.userId]
+                        const TargetIcon = targetTypeIcons[log.targetType as keyof typeof targetTypeIcons] || History
+                        return (
+                          <TableRow key={`${log.id}-${index}`} className="border-border hover:bg-muted/10 transition-colors duration-300">
+                            <TableCell className="px-6 py-4">
+                              <div className="text-sm text-muted-foreground whitespace-nowrap font-medium">
+                                {formatDateTime(log.createdAt)}
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+                                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-sm font-semibold">
+                                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <span className="text-sm font-semibold text-foreground">
+                                    {user?.lastName} {user?.firstName}
+                                  </span>
+                                  <div className="text-xs text-muted-foreground">
+                                    {user?.position}
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <Badge variant="outline" className={`font-normal border-border/50 ${
+                                log.action.includes('CREATED') ? 'bg-green-500/10 text-green-700 border-green-500/30' :
+                                log.action.includes('BLOCKED') || log.action.includes('ARCHIVED') ? 'bg-red-500/10 text-red-700 border-red-500/30' :
+                                log.action.includes('UPDATED') ? 'bg-blue-500/10 text-blue-700 border-blue-500/30' :
+                                'bg-muted/20 text-foreground border-muted/50'
+                              } transition-colors duration-200`}>
+                                {actionLabels[log.action as keyof typeof actionLabels] || log.action}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <div className="text-sm text-foreground max-w-md truncate" title={log.details}>
+                                {log.details}
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                <TargetIcon className="h-4 w-4 text-muted-foreground/70" />
+                                <Badge variant="secondary" className="font-normal bg-muted/20 text-foreground hover:bg-muted/30 transition-colors duration-200">
+                                  {log.targetType}
+                                </Badge>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </section>
+
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
 export default function AuditLogPage() {
   return (
-    <>
-      <Header title="Audit Log" description="Тизим амаллари тарихи ва мониторинг" />
-      <Suspense fallback={null}>
-        <AuditLogContent />
-      </Suspense>
-    </>
+    <Suspense fallback={<div>Yuklanmoqda...</div>}>
+      <AuditLogContent />
+    </Suspense>
   )
 }

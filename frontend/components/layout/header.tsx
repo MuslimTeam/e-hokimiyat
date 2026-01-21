@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Bell, Search, User, Settings, Sparkles, Menu, X, Building } from "lucide-react"
+import { Bell, Search, User, Settings, Sparkles, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -46,19 +46,19 @@ export function Header({ title, description }: HeaderProps) {
   }, [])
 
   return (
-      <header className="sticky top-0 z-50 flex h-16 sm:h-20 lg:h-24 items-center justify-between border-b border-border bg-background/80 backdrop-blur-xl transition-all duration-300 shadow-lg backdrop-saturate-150 px-3 sm:px-4 lg:px-6" role="banner">
+      <header className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-border bg-background/80 backdrop-blur-xl transition-all duration-300 shadow-lg backdrop-saturate-150" role="banner">
 
       {/* Left section - Title */}
-      <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 animate-slide-up">
+      <div className="flex items-center gap-6 animate-slide-up">
         <div className="relative">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
-            <Building className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-primary-foreground" />
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
+            <Sparkles className="w-6 h-6 text-primary-foreground" />
           </div>
         </div>
         <div>
-          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{title}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
           {description && (
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {description}
             </p>
           )}
@@ -66,19 +66,19 @@ export function Header({ title, description }: HeaderProps) {
       </div>
 
       {/* Center section - Search */}
-      <div className="relative hidden md:block flex-1 max-w-xs sm:max-w-md lg:max-w-lg mx-4 sm:mx-8 lg:mx-12">
+      <div className="relative hidden md:block flex-1 max-w-lg mx-8">
         <div className={cn(
           "relative group transition-all duration-300",
           isSearchFocused ? "scale-105" : ""
         )}>
           <Search className={cn(
             "absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 transition-all duration-250",
-            isSearchFocused ? "text-blue-600 scale-110" : "group-hover:text-gray-600"
+            isSearchFocused ? "text-emerald-600 scale-110" : "group-hover:text-gray-600"
           )} />
           <Input 
             placeholder="Қидируш..." 
             className={cn(
-              "w-full h-12 bg-white/60 backdrop-blur-sm border-2 border-blue-200/50 rounded-xl px-12 pr-4 text-gray-900 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:border-blue-500 transition-all duration-250"
+              "w-full h-12 bg-white/60 backdrop-blur-sm border-2 border-emerald-200/50 rounded-xl px-12 pr-4 text-gray-900 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:border-emerald-500 transition-all duration-250"
             )}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
@@ -88,7 +88,7 @@ export function Header({ title, description }: HeaderProps) {
       </div>
 
       {/* Right section - Notifications and User */}
-      <div className="flex items-center gap-3 sm:gap-4 lg:gap-6">
+      <div className="flex items-center gap-4">
         {/* Mobile menu toggle */}
         <Button
           variant="ghost"
@@ -107,14 +107,14 @@ export function Header({ title, description }: HeaderProps) {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="relative z-20 h-10 w-10 transition-all duration-250 hover:bg-blue-50 hover:text-blue-600 rounded-lg hidden md:flex"
+                className="relative z-20 h-10 w-10 transition-all duration-250 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg hidden md:flex"
               >
                 <Bell className={cn(
                   "h-5 w-5 text-gray-600 transition-all duration-250",
                   unreadCount > 0 ? "animate-pulse" : ""
                 )} />
                 {unreadCount > 0 && (
-                  <Badge className="absolute -right-1 -top-1 h-6 w-6 rounded-full p-0 text-[10px] flex items-center justify-center bg-blue-600 text-white shadow-sm">
+                  <Badge className="absolute -right-1 -top-1 h-6 w-6 rounded-full p-0 text-[10px] flex items-center justify-center bg-emerald-600 text-white shadow-sm">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </Badge>
                 )}
@@ -123,14 +123,14 @@ export function Header({ title, description }: HeaderProps) {
           <DropdownMenuContent align="end" className="w-96 bg-white/90 backdrop-blur-xl border border-gray-200/50 shadow-xl">
             <DropdownMenuLabel className="flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-blue-600" />
+                <Bell className="w-5 h-5 text-emerald-600" />
                 <span className="font-semibold text-gray-900">Билдиришномалар</span>
               </div>
               <Link href="/dashboard/notifications">
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-auto p-0 text-xs text-blue-600 hover:text-blue-700 transition-all duration-250"
+                  className="h-auto p-0 text-xs text-emerald-600 hover:text-emerald-700 transition-all duration-250"
                 >
                   Барчасини кўриш
                 </Button>
