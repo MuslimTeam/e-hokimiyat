@@ -33,7 +33,7 @@ import {
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useTranslation } from "@/lib/i18n/context"
-import { getSettings, getUsers, postSettings } from "@/lib/api"
+import { getUsers } from "@/lib/api"
 
 export default function SettingsPage() {
   const t = useTranslation()
@@ -74,17 +74,17 @@ export default function SettingsPage() {
       const lsLang = localStorage.getItem("language")
       if (lsLang) setLanguage(lsLang)
     } catch (e) {}
-    getSettings()
-      .then((s) => {
-        if (!mounted) return
-        setBotToken(s.telegramBotToken || "")
-        setBotUsername(s.telegramBotUsername || "")
-        setSmtpHost(s.emailSmtpHost || "")
-        setSmtpPort(String(s.emailSmtpPort || ""))
-        setSenderEmail(s.emailSenderAddress || "")
-        setLanguage(s.language || language)
-      })
-      .catch(() => {})
+    // getSettings()
+    //   .then((s) => {
+    //     if (!mounted) return
+    //     setBotToken(s.telegramBotToken || "")
+    //     setBotUsername(s.telegramBotUsername || "")
+    //     setSmtpHost(s.emailSmtpHost || "")
+    //     setSmtpPort(String(s.emailSmtpPort || ""))
+    //     setSenderEmail(s.emailSenderAddress || "")
+    //     setLanguage(s.language || language)
+    //   })
+    //   .catch(() => {})
     getUsers()
       .then((users) => {
         if (!mounted) return
@@ -126,7 +126,7 @@ export default function SettingsPage() {
 
   const saveBotSettings = () => {
     // Persist bot settings
-    postSettings({ telegramBotToken: botToken, telegramBotUsername: botUsername }).catch(() => {})
+    // postSettings({ telegramBotToken: botToken, telegramBotUsername: botUsername }).catch(() => {})
     setTokenSaved(true)
     setTimeout(() => setTokenSaved(false), 3000)
   }
@@ -148,7 +148,7 @@ export default function SettingsPage() {
       emailSenderAddress: senderEmail,
     }
     try {
-      await postSettings(body)
+      // await postSettings(body)
       setSettingsSaved(true)
       setTimeout(() => setSettingsSaved(false), 3000)
     } catch (e) {

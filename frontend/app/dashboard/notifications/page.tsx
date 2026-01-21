@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { Bell, Check, Trash2, Settings, Filter, Search, Info, AlertTriangle, CheckCircle, XCircle, Calendar } from "lucide-react"
 import { getNotifications } from "@/lib/api"
 import { Header } from "@/components/layout/header"
@@ -109,16 +110,15 @@ export default function NotificationsPage() {
               </div>
               
               {/* Controls */}
-              <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-md p-6">
+              <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-md p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="relative flex-1 sm:max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <input
-                      type="text"
+                    <Input
                       placeholder="Билдиришномаларни қидириш..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 bg-background/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full pl-10 bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all"
                     />
                   </div>
                   
@@ -127,10 +127,10 @@ export default function NotificationsPage() {
                       <button
                         key={type}
                         onClick={() => setFilter(type)}
-                        className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                           filter === type
-                            ? `${config.color} text-white`
-                            : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                            ? `${config.color} text-white shadow-sm`
+                            : "bg-muted/50 text-muted-foreground hover:bg-muted border border-transparent"
                         }`}
                       >
                         {config.label}
@@ -138,21 +138,21 @@ export default function NotificationsPage() {
                     ))}
                     <button
                       onClick={() => setFilter("all")}
-                      className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                         filter === "all"
-                          ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white"
-                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                        }`}
-                      >
-                        Барчаси
-                      </button>
+                          ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-sm"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted border border-transparent"
+                      }`}
+                    >
+                      Барчаси
+                    </button>
                   </div>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       onClick={markAllAsRead}
                       disabled={unreadCount === 0}
-                      className="hover:bg-muted/20"
+                      className="hover:bg-muted/20 border-border/50 bg-background/50"
                     >
                       <Check className="mr-2 h-4 w-4" />
                       Барчасини ўқилган деб белгилаш
@@ -161,7 +161,7 @@ export default function NotificationsPage() {
                       variant="outline"
                       onClick={clearAllNotifications}
                       disabled={notifications.length === 0}
-                      className="hover:bg-destructive/10 hover:text-destructive"
+                      className="hover:bg-destructive/10 hover:text-destructive border-border/50 bg-background/50"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Барчасини тозалаш

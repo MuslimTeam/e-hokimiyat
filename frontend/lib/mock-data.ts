@@ -42,26 +42,35 @@ export interface User {
   lastName: string
   middleName: string
   phone?: string
+  email?: string
   role: UserRole
   organizationId?: string
   position: string
   status: UserStatus
   oneidConnected: boolean
+  avatar?: string
   createdAt: string
   activatedAt?: string
   lastLoginAt?: string
   department?: string
+  address?: string
 }
 
 export interface Organization {
   id: string
   name: string
-  sector: Sector // Added sector field
+  sector: Sector
   parentOrgId?: string
   isActive: boolean
   tasksCount: number
   completedTasks: number
   rating: number
+  address?: string
+  phone?: string
+  email?: string
+  website?: string
+  head?: string
+  establishedYear?: number
 }
 
 export interface Task {
@@ -70,11 +79,15 @@ export interface Task {
   description: string
   priority: TaskPriority
   status: TaskStatus
-  sector: Sector // Added sector field
+  sector: Sector
   deadline: string
   createdAt: string
   createdBy: string
   organizations: string[]
+  progress?: number
+  assignedTo?: string
+  documents?: string[]
+  budget?: string
   location?: { lat: number; lng: number }
   attachments?: string[]
 }
@@ -237,130 +250,152 @@ export const priorityDescriptions: Record<TaskPriority, string> = {
 export const mockUsers: User[] = [
   {
     id: "1",
-    pnfl: "312345678901",
-    firstName: "Абдулла",
+    pnfl: "12345678901234",
+    firstName: "Абдуллаҳ",
     lastName: "Каримов",
-    middleName: "Бахтиёрович",
+    middleName: "Баҳодирович",
     phone: "+998901234567",
+    email: "a.karimov@hokimiyat.uz",
     role: "TUMAN_HOKIMI",
-    position: "Туман ҳокимлиги раиси",
+    position: "Туман ҳокими",
     organizationId: "1",
     department: "Бошқарув бўлими",
     status: "FAOL",
     oneidConnected: true,
+    avatar: "",
     createdAt: "2024-01-15T09:00:00Z",
     activatedAt: "2024-01-15T10:00:00Z",
-    lastLoginAt: "2024-01-20T08:30:00Z"
+    lastLoginAt: "2024-01-20T08:30:00Z",
+    address: "Тошкент шаҳар, Мирзо Улуг'бек кўчаси, 100000"
   },
   {
     id: "2",
-    pnfl: "345678901234",
+    pnfl: "23456789012345",
     firstName: "Дилшод",
-    lastName: "Рахимов",
+    lastName: "Раҳимов",
     middleName: "Алимжон",
     phone: "+998902345678",
+    email: "d.rahimov@hokimiyat.uz",
     role: "HOKIMLIK_MASUL",
-    position: "Туман ҳокимлиги ўринба",
-    organizationId: "2",
-    department: "Маҳалли бўлими",
+    position: "Ҳокимлик ўринбаси",
+    organizationId: "1",
+    department: "Иқтисодиёт бўлими",
     status: "FAOL",
     oneidConnected: true,
-    createdAt: "2024-01-10T14:00:00Z",
-    activatedAt: "2024-01-10T15:00:00Z",
-    lastLoginAt: "2024-01-20T07:45:00Z"
+    avatar: "",
+    createdAt: "2024-01-10T08:00:00Z",
+    activatedAt: "2024-01-10T09:00:00Z",
+    lastLoginAt: "2024-01-20T07:45:00Z",
+    address: "Тошкент шаҳар, Мирзо Улуг'бек кўчаси, 100000"
   },
   {
     id: "3",
-    pnfl: "456789012345",
-    firstName: "Сардор",
-    lastName: "Алиев",
-    middleName: "Умидович",
+    pnfl: "34567890123456",
+    firstName: "Ботир",
+    lastName: "Тўхтаев",
+    middleName: "Саидович",
     phone: "+998903456789",
+    email: "b.toxtaev@hokimiyat.uz",
     role: "TASHKILOT_RAHBAR",
-    position: "Туман ҳокимлиги ўринба",
-    organizationId: "3",
-    department: "Таълим бўлими",
+    position: "Ташкилот раҳбари",
+    organizationId: "2",
+    department: "Иқтисодиёт бўлими",
     status: "FAOL",
     oneidConnected: true,
-    createdAt: "2024-01-05T11:30:00Z",
-    activatedAt: "2024-01-05T16:00:00Z",
-    lastLoginAt: "2024-01-20T09:15:00Z"
+    avatar: "",
+    createdAt: "2024-01-12T10:00:00Z",
+    activatedAt: "2024-01-12T11:00:00Z",
+    lastLoginAt: "2024-01-19T16:20:00Z",
+    address: "Самарқанд шаҳар, Буюк Ичмон кўчаси, 140000"
   },
   {
     id: "4",
-    pnfl: "567890123456",
-    firstName: "Ботир",
-    lastName: "Тўхтаев",
-    middleName: "Эркингулович",
+    pnfl: "45678901234567",
+    firstName: "Гулнора",
+    lastName: "Тўхтасинова",
+    middleName: "Эркингизовна",
     phone: "+998904567890",
+    email: "g.toxtasinova@hokimiyat.uz",
     role: "TASHKILOT_MASUL",
-    position: "Туман ҳокимлиги ўринба",
-    organizationId: "4",
-    department: "Ижтимоий бўлими",
+    position: "Ташкилот масули",
+    organizationId: "3",
+    department: "Иқтисодиёт бўлими",
     status: "FAOL",
     oneidConnected: true,
-    createdAt: "2024-01-08T10:00:00Z",
-    activatedAt: "2024-01-08T14:00:00Z",
-    lastLoginAt: "2024-01-20T06:30:00Z"
+    avatar: "",
+    createdAt: "2024-01-08T09:00:00Z",
+    activatedAt: "2024-01-08T10:00:00Z",
+    lastLoginAt: "2024-01-18T14:30:00Z",
+    address: "Фарғона вилояти, Фарғона шаҳар, 710000"
   },
   {
     id: "5",
-    pnfl: "678901234567",
-    firstName: "Жамшит",
-    lastName: "Бобоев",
+    pnfl: "56789012345678",
+    firstName: "Жамшед",
+    lastName: "Бердиев",
     middleName: "Ахмадович",
     phone: "+998905678901",
+    email: "j.berdiev@hokimiyat.uz",
     role: "TASHKILOT_MASUL",
-    position: "Туман ҳокимлиги ўринба",
-    organizationId: "5",
-    department: "Соғлиқ бўлими",
+    position: "Ташкилот масули",
+    organizationId: "4",
+    department: "Иқтисодиёт бўлими",
     status: "FAOL",
     oneidConnected: true,
-    createdAt: "2024-01-12T09:00:00Z",
-    activatedAt: "2024-01-12T15:00:00Z",
-    lastLoginAt: "2024-01-20T08:00:00Z"
+    avatar: "",
+    createdAt: "2024-01-05T08:00:00Z",
+    activatedAt: "2024-01-05T09:00:00Z",
+    lastLoginAt: "2024-01-17T13:15:00Z",
+    address: "Наманган вилояти, Наманган шаҳар, 160000"
   },
   {
     id: "6",
-    pnfl: "789012345678",
-    firstName: "Олимжон",
-    lastName: "Тўхтаев",
-    middleName: "Каримович",
-    phone: "+998907890123",
+    pnfl: "67890123456789",
+    firstName: "Шерзод",
+    lastName: "Рахимов",
+    middleName: "Умидович",
+    phone: "+998906789012",
+    email: "s.rahimov@hokimiyat.uz",
     role: "ADMIN",
-    position: "Туман ҳокимлиги раиси",
+    position: "Тизим администратори",
     organizationId: "1",
     department: "Бошқарув бўлими",
     status: "FAOL",
     oneidConnected: true,
+    avatar: "",
     createdAt: "2024-01-01T09:00:00Z",
     activatedAt: "2024-01-01T10:00:00Z",
-    lastLoginAt: "2024-01-20T08:30:00Z"
+    lastLoginAt: "2024-01-20T08:00:00Z",
+    address: "Тошкент шаҳар, Яшнабад тумани, 100000"
   },
   {
     id: "7",
-    pnfl: "890123456789",
-    firstName: "Гулсара",
-    lastName: "Холматова",
-    middleName: "Равшанбек қизи",
-    phone: "+998908765432",
+    pnfl: "78901234567890",
+    firstName: "Муҳаммад",
+    lastName: "Усмонов",
+    middleName: "Алимжон",
+    phone: "+998907890123",
+    email: "m.usmonov@hokimiyat.uz",
     role: "TASHKILOT_MASUL",
-    position: "Туман ҳокимлиги ўринба",
-    organizationId: "2",
-    department: "Таълим бўлими",
+    position: "Ташкилот раҳбари",
+    organizationId: "5",
+    department: "Иқтисодиёт бўлими",
     status: "FAOL",
     oneidConnected: true,
+    avatar: "",
     createdAt: "2024-01-03T08:00:00Z",
-    activatedAt: "2024-01-03T15:00:00Z",
-    lastLoginAt: "2024-01-20T07:00:00Z"
+    activatedAt: "2024-01-03T09:00:00Z",
+    lastLoginAt: "2024-01-19T11:20:00Z",
+    address: "Қорақалпоғ вилояти, Қорақалпоғ шаҳар, 150000"
   },
   {
     id: "8",
-    pnfl: "234567890123",
-    firstName: "Нодира",
-    lastName: "Алимова",
-    middleName: "Алимжон ўғил",
-    phone: "+998909876543",
+    pnfl: "89012345678901",
+    firstName: "Зухра",
+    lastName: "Сиддиқов",
+    middleName: "Баҳромович",
+    phone: "+998908901234",
+    email: "z.siddikov@hokimiyat.uz",
     role: "TASHKILOT_MASUL",
     position: "Туман ҳокимлиги ўринба",
     organizationId: "3",
@@ -376,75 +411,123 @@ export const mockUsers: User[] = [
 export const mockOrganizations: Organization[] = [
   {
     id: "1",
-    name: "Kommunal xo'jalik bo'limi",
-    sector: "KOMMUNAL_SOHA",
+    name: "Тошкент шаҳар ҳокимлиги",
+    sector: "IQTISODIYOT_BIZNES",
     isActive: true,
     tasksCount: 45,
     completedTasks: 38,
-    rating: 84,
+    rating: 94,
+    address: "Тошкент шаҳар, Мирзо Улуг'бек кўчаси, 100000",
+    phone: "+99871234567",
+    email: "tashkent@hokimiyat.uz",
+    website: "tashkent.hokimiyat.uz",
+    head: "Тўхтаев Абдуллоҳ Ҳамидович",
+    establishedYear: 1992
   },
   {
     id: "2",
-    name: "Ta'lim bo'limi",
-    sector: "TALIM",
+    name: "Самарқанд шаҳар ҳокимлиги",
+    sector: "IQTISODIYOT_BIZNES",
     isActive: true,
     tasksCount: 32,
-    completedTasks: 30,
-    rating: 94,
+    completedTasks: 28,
+    rating: 88,
+    address: "Самарқанд шаҳар, Буюк Ичмон кўчаси, 140000",
+    phone: "+99862234567",
+    email: "samarkand@hokimiyat.uz",
+    website: "samarkand.hokimiyat.uz",
+    head: "Қодиров Баҳодир Ҳамидович",
+    establishedYear: 1995
   },
   {
     id: "3",
-    name: "Sog'liqni saqlash bo'limi",
-    sector: "SOGLIQNI_SAQLASH",
+    name: "Бухоро шаҳар ҳокимлиги",
+    sector: "KOMMUNAL_SOHA",
     isActive: true,
     tasksCount: 28,
-    completedTasks: 22,
-    rating: 79,
+    completedTasks: 25,
+    rating: 89,
+    address: "Бухоро шаҳар, Марказ кўчаси, 200100",
+    phone: "+99865434567",
+    email: "bukhoro@hokimiyat.uz",
+    website: "bukhoro.hokimiyat.uz",
+    head: "Солиҳиддинов Азиз",
+    establishedYear: 1993
   },
   {
     id: "4",
-    name: "Moliya bo'limi",
-    sector: "IQTISODIYOT_BIZNES",
+    name: "Фарғона вилояти ҳокимлиги",
+    sector: "KOMMUNAL_SOHA",
+    isActive: true,
+    tasksCount: 35,
+    completedTasks: 30,
+    rating: 86,
+    address: "Фарғона шаҳар, Ислом Каримов кўчаси, 710000",
+    phone: "+99873434567",
+    email: "ferghana@hokimiyat.uz",
+    website: "ferghana.hokimiyat.uz",
+    head: "Умаров Ботир",
+    establishedYear: 1994
+  },
+  {
+    id: "5",
+    name: "Наманган вилояти ҳокимлиги",
+    sector: "KOMMUNAL_SOHA",
+    isActive: true,
+    tasksCount: 22,
+    completedTasks: 18,
+    rating: 82,
+    address: "Наманган шаҳар, Ал Хоразмий кўчаси, 160000",
+    phone: "+99869434567",
+    email: "namangan@hokimiyat.uz",
+    website: "namangan.hokimiyat.uz",
+    head: "Эркинов Баҳодир",
+    establishedYear: 1996
+  },
+  {
+    id: "6",
+    name: "Андижон вилояти ҳокимлиги",
+    sector: "KOMMUNAL_SOHA",
     isActive: true,
     tasksCount: 18,
     completedTasks: 17,
     rating: 94,
+    address: "Андижон шаҳар, Бобур кўчаси, 170000",
+    phone: "+99874234567",
+    email: "andijan@hokimiyat.uz",
+    website: "andijan.hokimiyat.uz",
+    head: "Юлдашов Муҳаммад",
+    establishedYear: 1997
   },
   {
-    id: "5",
-    name: "Yoshlar ishlari bo'limi",
-    sector: "YOSHLAR",
-    isActive: true,
-    tasksCount: 12,
-    completedTasks: 10,
-    rating: 83,
-  },
-  {
-    id: "6",
-    name: "Bandlik markazi",
-    sector: "BANDLIK_MEHNAT",
+    id: "7",
+    name: "Хоразм вилояти ҳокимлиги",
+    sector: "KOMMUNAL_SOHA",
     isActive: true,
     tasksCount: 25,
     completedTasks: 20,
     rating: 80,
-  },
-  {
-    id: "7",
-    name: "Ijtimoiy himoya markazi",
-    sector: "IJTIMOIY_HIMOYA",
-    isActive: true,
-    tasksCount: 35,
-    completedTasks: 28,
-    rating: 80,
+    address: "Хоразм шаҳар, Шарқий Раҳимов кўчаси, 180000",
+    phone: "+99867434567",
+    email: "khorezm@hokimiyat.uz",
+    website: "khorezm.hokimiyat.uz",
+    head: "Раҳимов Қудратқон",
+    establishedYear: 1992
   },
   {
     id: "8",
-    name: "Ekologiya inspeksiyasi",
-    sector: "EKOLOGIYA",
+    name: "Қорақалпоғ вилояти ҳокимлиги",
+    sector: "KOMMUNAL_SOHA",
     isActive: true,
     tasksCount: 15,
     completedTasks: 12,
-    rating: 80,
+    rating: 83,
+    address: "Қорақалпоғ шаҳар, Мустақиллик кўчаси, 150000",
+    phone: "+99866634567",
+    email: "qoraqalpog@hokimiyat.uz",
+    website: "qoraqalpog.hokimiyat.uz",
+    head: "Тўраев Жамшед",
+    establishedYear: 1998
   },
   {
     id: "9",
@@ -463,82 +546,105 @@ export const mockOrganizations: Organization[] = [
     tasksCount: 30,
     completedTasks: 27,
     rating: 90,
-  },
+  }
 ]
 
 export const mockTasks: Task[] = [
   {
     id: "1",
-    title: "Ichki yo'llarni ta'mirlash",
-    description: "Markaziy ko'chada 500 metr masofada yo'l qoplamasi ta'mirlash ishlari",
+    title: "Тошкент шаҳар ҳокимлиги биноси таъмириш лойиҳаси",
+    description: "Тошкент шаҳар ҳокимлиги биносини қайта таъмириш, замоналарни алмаштириш, энергия тежамли ишларини амалга ошириш",
     priority: "MUHIM_SHOSHILINCH",
     status: "IJRODA",
-    sector: "KOMMUNAL_SOHA",
-    deadline: "2026-02-01",
-    createdAt: "2026-01-10",
+    sector: "IQTISODIYOT_BIZNES",
+    deadline: "2026-01-25",
+    createdAt: "2026-01-15",
     createdBy: "1",
     organizations: ["1"],
-    location: { lat: 40.123, lng: 67.456 },
+    progress: 75,
+    assignedTo: "3",
+    documents: ["loyiha.docx", "smeta_rasmiy.pdf"],
+    budget: "2.5 миллиард сўм"
   },
   {
     id: "2",
-    title: "Maktab binosi ta'mirlash",
-    description: "15-sonli maktab sport zali va oshxona binosi kapital ta'mirlash",
+    title: "Самарқанд шаҳар ҳокимлигида янгилик масалаларини қуриш",
+    description: "Самарқанд шаҳаридаги 10 та масалани янгилаш, замонавий материаллар sotib olish, qurilishni nazorat qilish",
     priority: "MUHIM",
-    status: "BAJARILDI",
-    sector: "TALIM",
-    deadline: "2026-01-25",
-    createdAt: "2026-01-05",
-    createdBy: "1",
+    status: "YANGI",
+    sector: "IQTISODIYOT_BIZNES",
+    deadline: "2026-02-15",
+    createdAt: "2026-01-20",
+    createdBy: "2",
     organizations: ["2"],
+    progress: 0,
+    assignedTo: "4",
+    documents: ["masala_taklif.docx"],
+    budget: "800 миллион сўм"
   },
   {
     id: "3",
-    title: "Suv ta'minoti tizimini yangilash",
-    description: "Janubiy mahallada suv quvurlari almashtirish va yangi nasoslar o'rnatish",
-    priority: "MUHIM_SHOSHILINCH",
-    status: "MUDDATI_KECH",
+    title: "Бухоро шаҳар ҳокимлигида қишлоқ инфраструктури яхшириш",
+    description: "Бухоро шаҳаридаги 5 км асосий йўлни асфальтлаш, кўприкларни ўрнатish, йўл белгилари qo'yish",
+    priority: "SHOSHILINCH_EMAS",
+    status: "IJRODA",
     sector: "KOMMUNAL_SOHA",
-    deadline: "2026-01-15",
-    createdAt: "2026-01-01",
-    createdBy: "2",
-    organizations: ["1", "3"],
+    deadline: "2026-03-01",
+    createdAt: "2026-01-10",
+    createdBy: "3",
+    organizations: ["3"],
+    progress: 60,
+    assignedTo: "5",
+    documents: ["infrastructure_plan.pdf", "road_construction.jpg"],
+    budget: "3.2 миллиард сўм"
   },
   {
     id: "4",
-    title: "Tibbiyot punkti jihozlash",
-    description: "Qishloq tibbiyot punktiga zamonaviy tibbiy jihozlar yetkazib berish",
-    priority: "SHOSHILINCH_EMAS",
-    status: "NAZORATDAN_YECHILDI",
-    sector: "SOGLIQNI_SAQLASH",
-    deadline: "2026-01-20",
-    createdAt: "2025-12-20",
-    createdBy: "1",
-    organizations: ["3"],
+    title: "Фарғона вилоятида қишлоқ мактабларини таъмирлаш",
+    description: "Фарғона вилоятида 20 та мактабнинг қишлоқини ta'mirlash, mebel va jihozlarni yetkazish",
+    priority: "MUHIM",
+    status: "MUDDATI_KECH",
+    sector: "TALIM",
+    deadline: "2026-02-01",
+    createdAt: "2026-01-05",
+    createdBy: "4",
+    organizations: ["4"],
+    progress: 90,
+    assignedTo: "6",
+    documents: ["maktab_materials.xlsx", "renovation_plan.docx"],
+    budget: "1 миллиард сўм"
   },
   {
     id: "5",
-    title: "Yoshlar markazi ochish",
-    description: "Yangi yoshlar markazi binosi qurilishini yakunlash va jihozlash",
-    priority: "MUHIM",
-    status: "YANGI",
-    sector: "YOSHLAR",
-    deadline: "2026-03-01",
-    createdAt: "2026-01-17",
-    createdBy: "1",
-    organizations: ["5", "4"],
+    title: "Наманган вилоятида сув тармоқ тизимини модернизация қилиш",
+    description: "Наманган шаҳарда 3 та қишлоқ об'ектини модернизация qilish, nasoslar va nasoslar o'rnatish",
+    priority: "ODDIY",
+    status: "IJRODA",
+    sector: "KOMMUNAL_SOHA",
+    deadline: "2026-04-15",
+    createdAt: "2026-01-25",
+    createdBy: "5",
+    organizations: ["5"],
+    progress: 30,
+    assignedTo: "7",
+    documents: ["water_system_design.pdf"],
+    budget: "5 миллиард сўм"
   },
   {
     id: "6",
-    title: "Elektr tarmog'ini kuchaytirish",
-    description: "Shimoliy tumanda elektr tarmoqlarini modernizatsiya qilish",
-    priority: "MUHIM",
-    status: "IJRODA",
-    sector: "KOMMUNAL_SOHA",
-    deadline: "2026-02-15",
-    createdAt: "2026-01-12",
-    createdBy: "2",
-    organizations: ["1"],
+    title: "Андижон вилоятида транспорт инфраструктури ривожатлари",
+    description: "Андижон шаҳаридаги транспорт yo'llarini ta'mirlash, ko'priklar va yo'l belgilari qo'yish",
+    priority: "SHOSHILINCH_EMAS",
+    status: "YANGI",
+    sector: "TRANSPORT",
+    deadline: "2026-03-15",
+    createdAt: "2026-01-18",
+    createdBy: "6",
+    organizations: ["6"],
+    progress: 0,
+    assignedTo: "8",
+    documents: ["road_repair_plan.docx"],
+    budget: "4 миллиард сўм"
   },
   {
     id: "7",
@@ -695,60 +801,129 @@ export const mockChatMessages: ChatMessage[] = [
   },
 ]
 
+export interface Appeal {
+  id: string
+  citizenName: string
+  citizenPhone: string
+  subject: string
+  description: string
+  category: string
+  status: string
+  createdAt: string
+  organizationId: string
+  assignedTo?: string
+  priority: string
+  deadline: string
+  response?: string
+}
+
+export const mockAppeals: Appeal[] = [
+  {
+    id: "1",
+    citizenName: "Абдулла Каримов",
+    citizenPhone: "+998901234567",
+    subject: "Ички йўлларни таъмирлаш",
+    description: "Махалламиздаги асосий кўчанинг зарарлангани ҳақида шикоят қиламан. Йўл қаттиқ ёғилгани учун транспорт ҳаракати қийинлашибтирмоқда.",
+    category: "YO'L_INFRATUKTURA",
+    status: "YANGI",
+    createdAt: "2026-01-17T10:30:00Z",
+    organizationId: "1",
+    assignedTo: "2",
+    priority: "MUHIM",
+    deadline: "2026-01-24T23:59:59Z",
+    response: null,
+  },
+  {
+    id: "2", 
+    citizenName: "Дилшод Рахимов",
+    citizenPhone: "+998902345678",
+    subject: "Макбинг иссиқлиги",
+    description: "3-мактабнинг қишки иссиқлиги тизими ишламаяпти. Болалар совукда дарс олаяпти.",
+    category: "TA'LIM",
+    status: "IJRODA",
+    createdAt: "2026-01-16T14:20:00Z",
+    organizationId: "2",
+    assignedTo: "3",
+    priority: "SHOSHILINCH_EMAS",
+    deadline: "2026-01-23T23:59:59Z",
+    response: "Текшириш учун мутахассис жўнатилди.",
+  },
+  {
+    id: "3",
+    citizenName: "Гулнора Тўхтасинова",
+    citizenPhone: "+998903456789", 
+    subject: "Сув таъминоти",
+    description: "Беркум туманида кеча соат 20:00 дан бери сув йўқ. Аҳоли етакилмоқда.",
+    category: "KOMMUNAL_XIZMAT",
+    status: "BAJARILDI",
+    createdAt: "2026-01-15T09:15:00Z",
+    organizationId: "3",
+    assignedTo: "4",
+    priority: "MUHIM_SHOSHILINCH",
+    deadline: "2026-01-15T23:59:59Z",
+    response: "Сув таъминоти тикланди. Узилик сабаби - насос станциясида техник ариза.",
+  }
+]
+
 export const mockNotifications: Notification[] = [
   {
     id: "1",
     type: "task_new",
-    title: "Yangi topshiriq",
-    description: "Ichki yo'llarni ta'mirlash - muddat: 01.02.2026",
+    title: "Тошкент шаҳар ҳокимлиги биноси таъмириш лойиҳаси",
+    description: "Тошкент шаҳар ҳокимлиги биносини қайта таъмириш лойиҳаси бошланди. Муддат: 2026-01-25",
     read: false,
-    createdAt: "2026-01-17T08:00:00",
+    createdAt: "2026-01-20T08:30:00Z",
     taskId: "1",
+    userId: "1"
   },
   {
     id: "2",
-    type: "task_completed",
-    title: "Hisobot topshirildi",
-    description: "Maktab binosi ta'mirlash - tekshiring",
+    type: "task_deadline",
+    title: "Самарқанд шаҳар ҳокимлигида янгилик масалаларини қуриш",
+    description: "Самарқанд шаҳар ҳокимлигида 10 та янгилик масаланинг муддати яқин қолмоқда. Муддат: 2026-01-22",
     read: false,
-    createdAt: "2026-01-17T07:30:00",
+    createdAt: "2026-01-22T16:00:00Z",
     taskId: "2",
+    userId: "2"
   },
   {
     id: "3",
-    type: "task_overdue",
-    title: "Muddat o'tdi",
-    description: "Suv ta'minoti tizimi - 2 kun kechikish",
-    read: false,
-    createdAt: "2026-01-17T06:00:00",
+    type: "task_completed",
+    title: "Бухоро шаҳар ҳокимлигида қишлоқ инфраструктури яхшириш якунланди",
+    description: "Бухоро шаҳар ҳокимлигида 5 км асосий йўлни асфальтлаш ишлари якунланди. Муддат: 2026-01-18",
+    read: true,
+    createdAt: "2026-01-18T14:30:00Z",
     taskId: "3",
+    userId: "3"
   },
   {
     id: "4",
     type: "user_added",
-    title: "Yangi foydalanuvchi",
-    description: "Nodira Qodirova tizimga qo'shildi",
-    read: true,
-    createdAt: "2026-01-16T14:00:00",
-    userId: "5",
+    title: "Янги фойдаланувчи қўшилди",
+    description: "Фарғона вилояти ҳокимлигига янги фойдаланувчи қўшилди. Рол: TASHKILOT_MASUL",
+    read: false,
+    createdAt: "2026-01-21T09:15:00Z",
+    userId: "8"
   },
   {
     id: "5",
-    type: "task_new",
-    title: "Yangi topshiriq",
-    description: "Yoshlar markazi ochish - muddat: 01.03.2026",
+    type: "system",
+    title: "Тизим янгиланди",
+    description: "E-hokimiyat тизими янги функциялар қўшилди: фойдаланувчи бошқарув, ҳисоботлар ва аналитика",
     read: true,
-    createdAt: "2026-01-16T10:00:00",
-    taskId: "5",
+    createdAt: "2026-01-21T08:00:00Z",
+    userId: "6"
   },
   {
     id: "6",
-    type: "system",
-    title: "Tizim yangilandi",
-    description: "Yangi funksiyalar qo'shildi: Chat va Muddat uzaytirish",
-    read: true,
-    createdAt: "2026-01-15T09:00:00",
-  },
+    type: "task_overdue",
+    title: "Муддат узайтирилди",
+    description: "Фарғона вилоятида сув тармоқ тизими модернизацияси лойиҳаси. Муддат: 2026-01-15",
+    read: false,
+    createdAt: "2026-01-21T10:00:00Z",
+    taskId: "4",
+    userId: "4"
+  }
 ]
 
 export const mockAuditLogs: AuditLog[] = [
