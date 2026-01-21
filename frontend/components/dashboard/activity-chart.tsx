@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { BarChart3 } from "lucide-react"
 import React from "react"
+import { getAnalyticsTrends } from "@/lib/api"
 
 type ChartPoint = {
   period: string
@@ -20,21 +21,21 @@ export function ActivityChart() {
   React.useEffect(() => {
     let mounted = true
     setIsLoading(true)
-    // getAnalyticsTrends()
-    //   .then((trends) => {
-    //     if (!mounted) return
-    //     const mapped = trends.map((t: any) => ({
-    //       period: t.period,
-    //       yaratildi: t.created ?? 0,
-    //       bajarildi: t.completed ?? 0,
-    //       jami: (t.created ?? 0) + (t.completed ?? 0),
-    //     }))
-    //     setData(mapped)
-    //   })
-    //   .catch(() => {})
-    //   .finally(() => {
-    //     if (mounted) setIsLoading(false)
-    //   })
+    getAnalyticsTrends()
+      .then((trends) => {
+        if (!mounted) return
+        const mapped = trends.map((t: any) => ({
+          period: t.period,
+          yaratildi: t.created ?? 0,
+          bajarildi: t.completed ?? 0,
+          jami: (t.created ?? 0) + (t.completed ?? 0),
+        }))
+        setData(mapped)
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (mounted) setIsLoading(false)
+      })
     return () => {
       mounted = false
     }

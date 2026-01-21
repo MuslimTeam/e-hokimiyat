@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { getAppealById, getOrganizations, mockAppeals } from "@/lib/api"
+import { getAppealById, getOrganizations } from "@/lib/api"
+import { mockAppeals } from "@/lib/mock-data"
 import { ArrowLeft, Send, Calendar, Building2, User, Clock } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
@@ -118,13 +119,15 @@ export default function AppealDetailPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-8 py-8">
             {/* Back Button */}
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard/appeals">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Оркага қайтиш
-                </Button>
-              </Link>
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="flex items-center justify-between w-full">
+                <Link href="/dashboard/appeals">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Оркага қайтиш
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             {/* Appeal Details */}
