@@ -101,12 +101,15 @@ export default function AppealsPage() {
   return (
     <>
       <Header title="Мурожаатлар" description="Фуқаролар мурожаатлари бошқаруви тизими" />
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
-        {/* Animated background elements */}
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-blue-50">
+        {/* Modern geometric background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-10 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-purple-500/10 rounded-full animate-float" />
-          <div className="absolute top-20 right-16 w-12 h-12 sm:w-16 sm:h-16 lg:w-24 lg:h-24 bg-blue-500/10 rounded-full animate-float" style={{ animationDelay: "1s" }} />
-          <div className="absolute bottom-16 left-20 w-10 h-10 sm:w-12 sm:h-12 lg:w-20 lg:h-20 bg-pink-500/10 rounded-full animate-float" style={{ animationDelay: "2s" }} />
+          <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200/20 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-1/2 right-0 w-80 h-80 bg-gradient-to-bl from-indigo-200/15 to-transparent rounded-full blur-2xl" />
+          <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-gradient-to-tr from-purple-200/10 to-transparent rounded-full blur-xl" />
+          <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-gradient-to-br from-cyan-200/8 to-transparent rounded-full blur-lg" />
+          {/* Subtle grid pattern */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         </div>
         
         <div className="relative z-10 px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 lg:space-y-8">

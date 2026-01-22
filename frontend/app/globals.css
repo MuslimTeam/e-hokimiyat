@@ -7,39 +7,39 @@
 }
 
 :root {
-  --background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 50%, #dbeafe 100%);
+  --background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
   --foreground: #1e293b;
-  --card: rgba(255, 255, 255, 0.85);
+  --card: rgba(255, 255, 255, 0.95);
   --card-foreground: #1e293b;
   --popover: rgba(255, 255, 255, 0.95);
   --popover-foreground: #1e293b;
-  --primary: #1e40af;
+  --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: rgba(226, 232, 240, 0.8);
+  --secondary: rgba(241, 245, 249, 0.8);
   --secondary-foreground: #1e293b;
-  --muted: rgba(241, 245, 249, 0.8);
+  --muted: rgba(248, 250, 252, 0.8);
   --muted-foreground: #64748b;
-  --accent: rgba(226, 232, 240, 0.8);
+  --accent: rgba(241, 245, 249, 0.8);
   --accent-foreground: #1e293b;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: rgba(226, 232, 240, 0.6);
-  --input: rgba(255, 255, 255, 0.7);
-  --ring: #1e40af;
-  --chart-1: #1e40af;
+  --input: rgba(255, 255, 255, 0.9);
+  --ring: #2563eb;
+  --chart-1: #2563eb;
   --chart-2: #3b82f6;
   --chart-3: #10b981;
   --chart-4: #dc2626;
   --chart-5: #8b5cf6;
   --radius: 0.5rem;
-  --sidebar: rgba(255, 255, 255, 0.85);
+  --sidebar: rgba(255, 255, 255, 0.95);
   --sidebar-foreground: #1e293b;
-  --sidebar-primary: #1e40af;
+  --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(226, 232, 240, 0.8);
+  --sidebar-accent: rgba(241, 245, 249, 0.8);
   --sidebar-accent-foreground: #1e293b;
   --sidebar-border: rgba(226, 232, 240, 0.6);
-  --sidebar-ring: #1e40af;
+  --sidebar-ring: #2563eb;
   --warning: #f59e0b;
   --warning-foreground: #1e293b;
   --success: #10b981;
@@ -460,10 +460,188 @@ body {
   background-color: rgba(220, 252, 231, 1);
 }
 
-/* Enhanced animations and micro-interactions */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+/* Modern government portal styles */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.glass-card-premium {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.1) 0%, 
+    rgba(99, 102, 241, 0.05) 50%, 
+    rgba(139, 92, 246, 0.1) 100%);
+}
+
+.modern-shadow-premium {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.modern-shadow-premium:hover {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Enhanced animations */
+@keyframes float-gentle {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+    opacity: 0.6;
+  }
+  25% { 
+    transform: translateY(-3px) rotate(1deg); 
+    opacity: 0.8;
+  }
+  75% { 
+    transform: translateY(-2px) rotate(-1deg); 
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer-premium {
+  0% { 
+    background-position: -200% center;
+    opacity: 0;
+  }
+  50% { 
+    opacity: 1;
+  }
+  100% { 
+    background-position: 200% center;
+    opacity: 0;
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+
+.shimmer-premium {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 100%);
+  animation: shimmer-premium 3s ease-in-out infinite;
+}
+
+/* Premium status indicators */
+.status-indicator {
+  position: relative;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+  border-radius: inherit;
+}
+
+/* Modern input styles */
+.input-premium {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-premium:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Premium button styles */
+.btn-premium {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.btn-premium:hover::before {
+  left: 100%;
+}
+
+.btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+
+/* Government portal card styles */
+.gov-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gov-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(59, 130, 246, 0.3) 50%, 
+    transparent 100%);
+}
+
+.gov-card:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 @keyframes pulse-glow {

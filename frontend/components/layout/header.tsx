@@ -46,16 +46,16 @@ export function Header({ title, description }: HeaderProps) {
   }, [])
 
   return (
-      <header className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-border bg-background/80 backdrop-blur-xl transition-all duration-300 shadow-lg backdrop-saturate-150" role="banner">
+      <header className="sticky top-0 z-50 flex h-32 items-center justify-between border-b border-border/50 bg-gradient-to-r from-white/90 via-gray-50/85 to-slate-50/80 backdrop-blur-xl transition-all duration-300 shadow-lg backdrop-saturate-150 px-6 py-6" role="banner">
 
       {/* Left section - Title */}
-      <div className="flex items-center gap-6 animate-slide-up">
+      <div className="flex items-center gap-6 animate-slide-up flex-1">
         <div className="relative">
           <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
             <Sparkles className="w-6 h-6 text-primary-foreground" />
           </div>
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold text-foreground">{title}</h1>
           {description && (
             <p className="text-sm text-muted-foreground">
@@ -66,7 +66,7 @@ export function Header({ title, description }: HeaderProps) {
       </div>
 
       {/* Center section - Search */}
-      <div className="relative hidden md:block flex-1 max-w-lg mx-8">
+      <div className="relative hidden md:block flex-1 max-w-lg mx-6">
         <div className={cn(
           "relative group transition-all duration-300",
           isSearchFocused ? "scale-105" : ""
@@ -88,7 +88,7 @@ export function Header({ title, description }: HeaderProps) {
       </div>
 
       {/* Right section - Notifications and User */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-1 justify-end">
         {/* Mobile menu toggle */}
         <Button
           variant="ghost"

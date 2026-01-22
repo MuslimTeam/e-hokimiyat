@@ -166,6 +166,12 @@ export async function getAnalyticsTrends() {
   return res.json()
 }
 
+export async function getAppeals() {
+  const res = await fetch(`${API_BASE}/api/appeals`)
+  if (!res.ok) throw new Error("Failed to fetch appeals")
+  return res.json()
+}
+
 export async function getAppealById(id: string) {
   const res = await fetch(`${API_BASE}/api/appeals/${id}`)
   if (!res.ok) throw new Error("Failed to fetch appeal")
