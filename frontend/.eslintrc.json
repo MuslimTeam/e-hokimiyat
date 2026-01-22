@@ -1,0 +1,44 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/prefer-const": "error",
+    "@typescript-eslint/no-var-requires": "error",
+    "prefer-const": "error",
+    "no-var": "error",
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-alert": "warn",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "warn",
+    "no-script-url": "error",
+    "no-lone-blocks": "warn",
+    "complexity": ["warn", 10],
+    "max-lines": ["warn", 500],
+    "max-lines-per-function": ["warn", 50],
+    "max-depth": ["warn", 4],
+    "max-params": ["warn", 4]
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": "warn",
+        "@typescript-eslint/explicit-module-boundary-types": "warn",
+        "@typescript-eslint/no-explicit-any": "warn"
+      }
+    }
+  ]
+}

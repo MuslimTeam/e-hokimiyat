@@ -1,14 +1,30 @@
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { securityHeaders, corsMiddleware, rateLimitMiddleware } from '@/lib/security'
 
-// Performance monitoring middleware
-export function middleware(request: Request) {
-  const start = Date.now()
+// Combine all security middleware
+export function middleware(request: NextRequest) {
+  // Apply security headers first
+  const securityResponse = securityHeaders()(request)
   
-  const response = NextResponse.next()
+  // Apply rate limiting
+  const rateLimitResponse = rateLimitMiddleware()(request)
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
   
-  // Add performance headers
-  response.headers.set('X-Response-Time', `${Date.now() - start}ms`)
-  response.headers.set('Cache-Control', 'public, s-max-age=31536000, immutable')
+  // Apply CORS
+  const corsResponse = corsMiddleware()(request)
+  if (corsResponse) {
+    return corsResponse
+  }
   
-  return response
+  return securityResponse
+}
+
+export const config = {
+  matcher: [
+    '/api/:path*',
+    '/dashboard/:path*',
+  ],
 }
