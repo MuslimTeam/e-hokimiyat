@@ -80,15 +80,15 @@ export function Sidebar() {
   return (
     <div
       className={cn(
-        "relative flex h-screen flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 shadow-sm",
+        "relative flex h-screen flex-col bg-gradient-to-b from-gray-50/95 via-slate-50/90 to-blue-50/85 backdrop-blur-xl text-sidebar-foreground border-r border-sidebar-border/50 transition-all duration-300 shadow-lg",
         collapsed ? "w-20" : "w-72"
       )}
     >
       
       {/* Header */}
-      <div className="relative z-10 flex h-35 items-center justify-between border-b border-sidebar-border bg-sidebar transition-all duration-300">
+      <div className="relative z-10 flex h-35 items-center justify-between border-b border-sidebar-border/50 bg-gradient-to-r from-white/80 via-gray-50/70 to-slate-50/80 backdrop-blur-md transition-all duration-300">
         {!collapsed && (
-          <div className="flex items-center gap-3 px-4">
+          <Link href="/dashboard" className="flex items-center gap-3 px-4 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary text-primary-foreground shadow-sm">
               <span className="font-bold text-sm">ЭХ</span>
             </div>
@@ -96,7 +96,7 @@ export function Sidebar() {
               <h1 className="text-lg font-semibold tracking-tight">e-hokimiyat</h1>
               <p className="text-xs text-muted-foreground">Электрон ҳокимият платформаси</p>
             </div>
-          </div>
+          </Link>
         )}
         
         <Button
@@ -111,6 +111,15 @@ export function Sidebar() {
           )} />
         </Button>
       </div>
+
+      {/* Collapsed Logo */}
+      {collapsed && (
+        <div className="flex justify-center py-4">
+          <Link href="/dashboard" className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary text-primary-foreground shadow-sm hover:opacity-80 transition-opacity">
+            <span className="font-bold text-sm">ЭХ</span>
+          </Link>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav

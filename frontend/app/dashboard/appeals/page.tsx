@@ -2,7 +2,7 @@
 
 import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
@@ -23,413 +23,421 @@ import {
   Calendar, 
   MoreHorizontal,
   Eye,
-  Archive
+  Archive,
+  Plus
 } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { getAppeals } from "@/lib/api"
+import { Appeal, FilterOptions, Stats } from "@/types"
+
+// Constants
+const PRIORITY_COLORS = {
+  LOW: "bg-gray-100 text-gray-800 border-gray-200",
+  MEDIUM: "bg-yellow-100 text-yellow-800 border-yellow-200", 
+  HIGH: "bg-red-100 text-red-800 border-red-200"
+}
+
+const STATUS_COLORS = {
+  PENDING: "bg-blue-100 text-blue-800 border-blue-200",
+  IN_PROGRESS: "bg-orange-100 text-orange-800 border-orange-200",
+  RESOLVED: "bg-green-100 text-green-800 border-green-200",
+  REJECTED: "bg-red-100 text-red-800 border-red-200"
+}
+
+const PRIORITY_LABELS = {
+  LOW: "Паст",
+  MEDIUM: "Ўртача", 
+  HIGH: "Юқори"
+}
+
+const STATUS_LABELS = {
+  PENDING: "Кутилмоқда",
+  IN_PROGRESS: "Бажарилмоқда",
+  RESOLVED: "Ҳал этилган",
+  REJECTED: "Рад этилган"
+}
 
 export default function AppealsPage() {
-  const [appeals, setAppeals] = useState<any[]>([])
-  const [stats, setStats] = useState<any>({ total: 0, pending: 0, inProgress: 0, resolved: 0 })
-  const [options, setOptions] = useState<any>({ status: {}, priority: {}, category: {}, districts: [] })
+  // State management
+  const [appeals, setAppeals] = useState<Appeal[]>([])
+  const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, inProgress: 0, resolved: 0 })
+  const [options, setOptions] = useState<FilterOptions>({ status: {}, priority: {}, category: {}, districts: [] })
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")
   const [districtFilter, setDistrictFilter] = useState("all")
-  const [selectedAppeal, setSelectedAppeal] = useState<any>(null)
+  const [selectedAppeal, setSelectedAppeal] = useState<Appeal | null>(null)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  useEffect(() => {
-    loadAppeals()
-  }, [searchQuery, statusFilter, categoryFilter, priorityFilter, districtFilter])
-
-  const loadData = async () => {
+  // Data loading
+  const loadData = useCallback(async () => {
     try {
-      // Mock stats and options data
-      const mockStats = { total: 0, pending: 0, inProgress: 0, resolved: 0 }
-      const mockOptions = { status: {}, priority: {}, category: {}, districts: [] }
+      setLoading(true)
+      // Mock data for now
+      const mockStats: Stats = {
+        total: 1247,
+        pending: 423,
+        inProgress: 189,
+        resolved: 635
+      }
       setStats(mockStats)
+
+      const mockOptions: FilterOptions = {
+        status: { all: "Барчаси", pending: "Кутилмоқда", in_progress: "Бажарилмоқда", resolved: "Ҳал этилган" },
+        priority: { all: "Барчаси", low: "Паст", medium: "Ўртача", high: "Юқори" },
+        category: { all: "Барчаси", social: "Ижтимоий", economic: "Иқтисодий", legal: "Ҳуқуқий", other: "Бошқа" },
+        districts: ["Тошкент шаҳри", "Андижон вилояти", "Бухоро вилояти", "Фарғона вилояти", "Жиззах вилояти", "Қашқадарё вилояти", "Навоий вилояти", "Наманган вилояти", "Самарқанд вилояти", "Сирдарё вилояти", "Сурхондарё вилояти", "Тошкент вилояти", "Хоразм вилояти"]
+      }
       setOptions(mockOptions)
     } catch (error) {
-      console.error('Failed to load data:', error)
+      console.error("Error loading data:", error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const loadAppeals = async () => {
+  const loadAppeals = useCallback(async () => {
     try {
+      setLoading(true)
       const data = await getAppeals()
       setAppeals(data || [])
     } catch (error) {
-      console.error('Failed to load appeals:', error)
+      console.error("Error loading appeals:", error)
+      setAppeals([])
+    } finally {
+      setLoading(false)
     }
+  }, [])
+
+  // Effects
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  useEffect(() => {
+    loadAppeals()
+  }, [loadAppeals])
+
+  // Filtered appeals
+  const filteredAppeals = useMemo(() => {
+    return appeals.filter(appeal => {
+      const matchesSearch = appeal.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         appeal.citizenName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         appeal.description.toLowerCase().includes(searchQuery.toLowerCase())
+      
+      const matchesStatus = statusFilter === "all" || appeal.status === statusFilter
+      const matchesCategory = categoryFilter === "all" || appeal.category === categoryFilter
+      const matchesPriority = priorityFilter === "all" || appeal.priority === priorityFilter
+      const matchesDistrict = districtFilter === "all" || appeal.district === districtFilter
+
+      return matchesSearch && matchesStatus && matchesCategory && matchesPriority && matchesDistrict
+    })
+  }, [appeals, searchQuery, statusFilter, categoryFilter, priorityFilter, districtFilter])
+
+  // Stats calculations
+  const calculatedStats = useMemo(() => ({
+    total: appeals.length,
+    pending: appeals.filter(a => a.status === 'PENDING').length,
+    inProgress: appeals.filter(a => a.status === 'IN_PROGRESS').length,
+    resolved: appeals.filter(a => a.status === 'RESOLVED').length
+  }), [appeals])
+
+  // Event handlers
+  const handleViewAppeal = (appeal: Appeal) => {
+    setSelectedAppeal(appeal)
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "KUTILMOQDA":
-        return <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-      case "JARAYONDA":
-        return <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-      case "HAL_ETILGAN":
-        return <Eye className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-      default:
-        return <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-    }
+  const handleCreateAppeal = () => {
+    setIsCreateDialogOpen(true)
   }
 
-  const statusColors = {
-    KUTILMOQDA: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30",
-    JARAYONDA: "bg-blue-500/20 text-blue-600 border-blue-500/30",
-    HAL_ETILGAN: "bg-green-500/20 text-green-600 border-green-500/30"
+  const handleArchiveAppeal = (appealId: string) => {
+    setAppeals(prev => prev.filter(appeal => appeal.id !== appealId))
   }
 
-  const priorityColors = {
-    PAST: "bg-gray-500/20 text-gray-600 border-gray-500/30",
-    ORTA: "bg-orange-500/20 text-orange-600 border-orange-500/30",
-    YUQORI: "bg-red-500/20 text-red-600 border-red-500/30"
+  if (loading) {
+    return (
+      <>
+        <Header title="Мурожаатлар" description="Фуқаролар мурожаатлари бошқаруви тизими" />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-blue-50">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="mt-4 text-muted-foreground">Юкланмоқда...</p>
+            </div>
+          </div>
+        </div>
+      </>
+    )
   }
 
   return (
     <>
       <Header title="Мурожаатлар" description="Фуқаролар мурожаатлари бошқаруви тизими" />
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
-        {/* Animated background elements */}
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-blue-50">
+        {/* Modern geometric background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-10 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-purple-500/10 rounded-full animate-float" />
-          <div className="absolute top-20 right-16 w-12 h-12 sm:w-16 sm:h-16 lg:w-24 lg:h-24 bg-blue-500/10 rounded-full animate-float" style={{ animationDelay: "1s" }} />
-          <div className="absolute bottom-16 left-20 w-10 h-10 sm:w-12 sm:h-12 lg:w-20 lg:h-20 bg-pink-500/10 rounded-full animate-float" style={{ animationDelay: "2s" }} />
+          <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200/20 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-1/2 right-0 w-80 h-80 bg-gradient-to-bl from-indigo-200/15 to-transparent rounded-full blur-2xl" />
+          <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-gradient-to-tr from-purple-200/10 to-transparent rounded-full blur-xl" />
+          <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-gradient-to-br from-cyan-200/8 to-transparent rounded-full blur-lg" />
+          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         </div>
         
-        <div className="relative z-10 px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 lg:space-y-8">
+        <div className="relative z-10 p-6 space-y-6">
           {/* Stats Cards */}
-          <section className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4 animate-slide-up">
-            <Card className="card-modern">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center animate-pulse-modern">
-                    <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
-                  </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{stats.total}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Жами мурожаатлар</p>
+                    <p className="text-sm font-medium text-muted-foreground">Жами мурожаатлар</p>
+                    <p className="text-2xl font-bold">{calculatedStats.total}</p>
                   </div>
+                  <MessageSquare className="h-8 w-8 text-muted-foreground" />
                 </div>
               </CardContent>
             </Card>
-            
-            <Card className="card-modern">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg sm:rounded-xl flex items-center justify-center animate-pulse-modern">
-                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{stats.pending}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Кутилмоқда</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="card-modern">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg sm:rounded-xl flex items-center justify-center animate-pulse-modern">
-                    <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{stats.inProgress}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Жараёнда</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="card-modern">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center animate-pulse-modern">
-                    <Eye className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{stats.resolved}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Ҳал этилган</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </section>
 
-          {/* Filters */}
-          <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
-            <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-md p-6">
-              <div className="flex flex-wrap gap-4">
-                <div className="flex-1 min-w-[200px]">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      placeholder="Мурожаатни қидириш..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all"
-                    />
+            <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Кутилмоқда</p>
+                    <p className="text-2xl font-bold text-blue-600">{calculatedStats.pending}</p>
                   </div>
+                  <Calendar className="h-8 w-8 text-blue-600" />
                 </div>
-                
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Бажарилмоқда</p>
+                    <p className="text-2xl font-bold text-orange-600">{calculatedStats.inProgress}</p>
+                  </div>
+                  <Search className="h-8 w-8 text-orange-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl hover:shadow-xl transition-all duration-300 hover:scale-102">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Ҳал этилган</p>
+                    <p className="text-2xl font-bold text-green-600">{calculatedStats.resolved}</p>
+                  </div>
+                  <Archive className="h-8 w-8 text-green-600" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters and Actions */}
+          <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg">Фильтрлаш ва қидирув</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Мурожаатларни қидирув..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <Button onClick={handleCreateAppeal} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Янги мурожаат
+                </Button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-4">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
-                    <SelectValue placeholder="Ҳолат" />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Ҳолатни танланг" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                    <SelectItem value="all">Барча ҳолатлар</SelectItem>
-                    {Object.entries(options.status || {}).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>{String(label)}</SelectItem>
+                  <SelectContent>
+                    {Object.entries(options.status).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>{value}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
-                    <SelectValue placeholder="Туркум" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                    <SelectItem value="all">Барча туркумлар</SelectItem>
-                    {Object.entries(options.category || {}).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>{String(label)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
+
                 <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
-                    <SelectValue placeholder="Устуворлик" />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Муҳимликни танланг" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                    <SelectItem value="all">Барча устуворликлар</SelectItem>
-                    {Object.entries(options.priority || {}).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>{String(label)}</SelectItem>
+                  <SelectContent>
+                    {Object.entries(options.priority).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>{value}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                
-                <Select value={districtFilter} onValueChange={setDistrictFilter}>
-                  <SelectTrigger className="w-[180px] bg-background/50 border-border/50 focus:bg-background focus:border-primary transition-all">
-                    <SelectValue placeholder="Туман" />
+
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Категорияни танланг" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-xl border-border/50">
-                    <SelectItem value="all">Барча туманлар</SelectItem>
-                    {(options.districts || []).map((district: any) => (
-                      <SelectItem key={district.id} value={district.id}>{district.name}</SelectItem>
+                  <SelectContent>
+                    {Object.entries(options.category).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>{value}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={districtFilter} onValueChange={setDistrictFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Ҳудудни танланг" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {options.districts.map(district => (
+                      <SelectItem key={district} value={district}>{district}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-          </section>
+            </CardContent>
+          </Card>
 
           {/* Appeals Table */}
-          <section className="animate-slide-up" style={{ animationDelay: "400ms" }}>
-            <Card className="card-modern">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/10 hover:bg-transparent">
-                      <TableHead className="text-muted-foreground">Сарлавҳа</TableHead>
-                      <TableHead className="text-muted-foreground">Аризачи</TableHead>
-                      <TableHead className="text-muted-foreground">Туркум</TableHead>
-                      <TableHead className="text-muted-foreground">Ҳолат</TableHead>
-                      <TableHead className="text-muted-foreground">Устуворлик</TableHead>
-                      <TableHead className="text-muted-foreground">Сана</TableHead>
-                      <TableHead className="text-muted-foreground w-[50px]"></TableHead>
+          <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Фуқаро</TableHead>
+                    <TableHead>Мавзу</TableHead>
+                    <TableHead>Категория</TableHead>
+                    <TableHead>Ҳолат</TableHead>
+                    <TableHead>Муҳимлик</TableHead>
+                    <TableHead>Ҳудуд</TableHead>
+                    <TableHead>Сана</TableHead>
+                    <TableHead>Амаллар</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredAppeals.map((appeal) => (
+                    <TableRow key={appeal.id} className="hover:bg-muted/50 transition-colors">
+                      <TableCell className="font-medium">{appeal.citizenName}</TableCell>
+                      <TableCell>
+                        <div className="max-w-xs truncate" title={appeal.subject}>
+                          {appeal.subject}
+                        </div>
+                      </TableCell>
+                      <TableCell>{appeal.category}</TableCell>
+                      <TableCell>
+                        <Badge className={cn("px-2 py-1 text-xs font-medium", STATUS_COLORS[appeal.status])}>
+                          {STATUS_LABELS[appeal.status]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={cn("px-2 py-1 text-xs font-medium", PRIORITY_COLORS[appeal.priority])}>
+                          {PRIORITY_LABELS[appeal.priority]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{appeal.district}</TableCell>
+                      <TableCell>{new Date(appeal.createdAt).toLocaleDateString("uz-UZ")}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleViewAppeal(appeal)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Батафсил
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleArchiveAppeal(appeal.id)}>
+                              <Archive className="mr-2 h-4 w-4" />
+                              Архивлаш
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {appeals.map((appeal) => (
-                      <TableRow key={appeal.id} className="border-white/10 hover:bg-white/5 transition-colors duration-200">
-                        <TableCell>
-                          <div>
-                            <p className="font-medium text-foreground">{appeal.title}</p>
-                            <p className="text-sm text-muted-foreground line-clamp-2">{appeal.content}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm">
-                            <User className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                            <span>{appeal.applicant}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-white/20">
-                            {String(options.category[appeal.category])}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={cn("border", statusColors[appeal.status])}>
-                            <div className="flex items-center gap-1">
-                              {getStatusIcon(appeal.status)}
-                              {String(options.status[appeal.status])}
-                            </div>
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={cn("border", priorityColors[appeal.priority])}>
-                            {String(options.priority[appeal.priority])}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                            {new Date(appeal.createdAt).toLocaleDateString('en-GB')}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/10">
-                                <MoreHorizontal className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass">
-                              <DropdownMenuItem className="hover:bg-white/10" onClick={() => setSelectedAppeal(appeal)}>
-                                <Eye className="mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                Кўриш
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="hover:bg-white/10">
-                                <Archive className="mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                Архивлаш
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* Appeal Detail Modal */}
-          {selectedAppeal && (
-            <Dialog open={!!selectedAppeal} onOpenChange={() => setSelectedAppeal(null)}>
-              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-bold text-foreground">{selectedAppeal.title}</DialogTitle>
-                  <DialogDescription className="text-muted-foreground">
-                    Мурожаат тафсилотлари
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="space-y-6">
-                  {/* Applicant Info */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-foreground">Аризачи маълумотлари</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">ФИО</p>
-                        <p className="font-medium text-foreground">{selectedAppeal.applicant}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Телефон</p>
-                        <p className="font-medium text-foreground">{selectedAppeal.phone}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Email</p>
-                        <p className="font-medium text-foreground">{selectedAppeal.email}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Туман</p>
-                        <p className="font-medium text-foreground">{(options.districts || []).find(d => d.id === selectedAppeal.district)?.name}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Appeal Content */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-foreground">Мурожаат матни</h4>
-                    <p className="text-sm leading-relaxed bg-muted/50 p-4 rounded-lg border border-border/50">
-                      {selectedAppeal.content}
-                    </p>
-                  </div>
-
-                  {/* Appeal Details */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-foreground">Мурожаат тафсилотлари</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Туркум</p>
-                        <Badge variant="outline" className="border-border/50 bg-background/50">
-                          {String(options.category[selectedAppeal.category])}
-                        </Badge>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Ҳолат</p>
-                        <Badge className={cn("border", statusColors[selectedAppeal.status])}>
-                          <div className="flex items-center gap-1">
-                            {getStatusIcon(selectedAppeal.status)}
-                            {String(options.status[selectedAppeal.status])}
-                          </div>
-                        </Badge>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Устуворлик</p>
-                        <Badge className={cn("border", priorityColors[selectedAppeal.priority])}>
-                          {String(options.priority[selectedAppeal.priority])}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Response */}
-                  {selectedAppeal.response && (
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-foreground">Жавоб</h4>
-                      <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                        <p className="text-sm leading-relaxed">{selectedAppeal.response}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Dates */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-foreground">Саналар</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Яратилган сана</p>
-                        <p className="font-medium">{new Date(selectedAppeal.createdAt).toLocaleDateString('en-GB')}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Масъул бўлим</p>
-                        <p className="font-medium">{selectedAppeal.department}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setSelectedAppeal(null)}>
-                    Ёпиш
-                  </Button>
-                  {selectedAppeal.status === 'KUTILMOQDA' && (
-                    <Button>
-                      Жавоб бериш
-                    </Button>
-                  )}
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
       </div>
+
+      {/* Appeal Detail Dialog */}
+      <Dialog open={!!selectedAppeal} onOpenChange={() => setSelectedAppeal(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Мурожаат тафсилотлари</DialogTitle>
+            <DialogDescription>
+              Мурожаат ҳақида тўлиқ маълумотлар
+            </DialogDescription>
+          </DialogHeader>
+          {selectedAppeal && (
+            <div className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Фуқаро</label>
+                  <p className="font-medium">{selectedAppeal.citizenName}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Телефон</label>
+                  <p className="font-medium">{selectedAppeal.citizenPhone}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Email</label>
+                  <p className="font-medium">{selectedAppeal.citizenEmail}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Ҳудуд</label>
+                  <p className="font-medium">{selectedAppeal.district}</p>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Мавзу</label>
+                <p className="font-medium">{selectedAppeal.subject}</p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Тафсилотлар</label>
+                <p className="text-muted-foreground whitespace-pre-wrap">{selectedAppeal.description}</p>
+              </div>
+              
+              <div className="flex gap-4">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Ҳолат</label>
+                  <Badge className={cn("px-2 py-1 text-xs font-medium", STATUS_COLORS[selectedAppeal.status])}>
+                    {STATUS_LABELS[selectedAppeal.status]}
+                  </Badge>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Муҳимлик</label>
+                  <Badge className={cn("px-2 py-1 text-xs font-medium", PRIORITY_COLORS[selectedAppeal.priority])}>
+                    {PRIORITY_LABELS[selectedAppeal.priority]}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedAppeal(null)}>
+              Ёпиш
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
